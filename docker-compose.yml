@@ -13,6 +13,21 @@ services:
     restart: always
     networks:
       - app-network
+    
+  tests:
+    build:
+      context: .
+      dockerfile: Dockerfile.tests
+    container_name: fastapi_tests
+    volumes:
+      - .:/app
+    environment:
+      - DATABASE_URL=postgresql://postgres:postgres@db:5432/fastapi_db
+    depends_on:
+      - db
+    networks:
+      - app-network
+    command: pytest
 
   db:
     image: postgres:15
