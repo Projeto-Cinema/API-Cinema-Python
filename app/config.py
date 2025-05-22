@@ -1,12 +1,13 @@
 from typing import Optional
 from pydantic_settings import BaseSettings
+from pydantic import ConfigDict
 
 class Settings(BaseSettings):
     PROJECT_NAME: str = "Cinema API"
     PROJECT_VERSION: str = "1.0.0"
     PROJECT_DESCRIPTION: str = "API para gerenciamento de cinema"
 
-    DATABSE_URL: str = "postgresql://postgres:postgres@db:5432/fastapi_db"
+    DATABASE_URL: str = "postgresql://postgres:postgres@db:5432/fastapi_db"
 
     SECRET_KEY: str = "your_secret_key"
     ALGORITHM: str = "HS256"
@@ -14,8 +15,9 @@ class Settings(BaseSettings):
 
     CORS_ORIGINS: list[str] = ["*"]
 
-    class Config:
-        env_file = ".env"
-        env_file_encoding = "utf-8"
+    model_config = ConfigDict(
+        env_file=".env",
+        env_file_encoding="utf-8"
+    )
 
 settings = Settings()
