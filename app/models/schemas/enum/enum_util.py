@@ -15,3 +15,8 @@ class StatusSessaoEnum(str, Enum):
     ATIVA = "Ativa"
     INATIVA = "Inativa"
     CANCELADA = "Cancelada"
+
+class StatusSalaEnum(str, Enum):
+    ATIVA = "Ativa"
+    INATIVA = "Inativa"
+    CANCELADA = "Cancelada"
