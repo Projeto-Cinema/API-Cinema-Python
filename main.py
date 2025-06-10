@@ -5,18 +5,25 @@ from sqlalchemy import text
 from app.config import settings
 from app.database import get_db, create_tables
 
-from app.models.cinema import Cinema, Sala
+from app.models.cinema import Cinema
+from app.models.sala import Sala
 from app.models.filme import Filme
-from app.models.Produto import Produto, Pagamento
+from app.models.Produto import Produto
+from app.models.pagamento import Pagamento
 from app.models.reserva import Reserva, ItemReserva
-from app.models.sessao import Sessao, Assento
-from app.models.usuario import Usuario, Endereco
+from app.models.sessao import Sessao
+from app.models.assento import Assento
+from app.models.usuario import Usuario
+from app.models.endereco import Endereco
+
+from app.controllers.usuario_controller import router as usuario_router
 
 app = FastAPI(
     title=settings.PROJECT_NAME,
     version=settings.PROJECT_VERSION,
     description=settings.PROJECT_DESCRIPTION,
 )
+app.include_router(usuario_router, prefix="/api/v1", tags=["Users"])
 
 @app.on_event("startup")
 async def startup_event():
