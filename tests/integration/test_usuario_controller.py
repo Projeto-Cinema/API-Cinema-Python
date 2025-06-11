@@ -68,3 +68,33 @@ class TestUsuarioGetByID:
         assert response_data["nome"] == create_user["nome"]
         assert response_data["email"] == create_user["email"]
         assert response_data["telefone"] == create_user["telefone"]
+
+class TestUsuarioGetByEmail:
+
+    @pytest.fixture
+    def usuario_data(self):
+        return {
+            "nome": "Wesley",
+            "email": "wesley@gmail.com",
+            "senha": "senha123",
+            "telefone": "1234567890"
+        }
+    
+    @pytest.fixture
+    def create_user(self, client, usuario_data):
+        response = client.post("api/v1/Users", json=usuario_data)
+        assert response.status_code == status.HTTP_201_CREATED
+        return response.json()
+    
+    def test_get_user_by_email_integration_success(self, client, create_user):
+        user_email = create_user["email"]
+
+        response = client.get(f"/api/v1/Users/email/{user_email}")
+
+        assert response.status_code == status.HTTP_200_OK
+
+        response_data = response.json()
+        assert response_data["id"] == create_user["id"]
+        assert response_data["nome"] == create_user["nome"]
+        assert response_data["email"] == user_email
+        assert response_data["telefone"] == create_user["telefone"]
