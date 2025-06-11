@@ -113,7 +113,8 @@ async def update_user(
 
 @router.delete(
     "/{usuario_id}",
-    status_code=status.HTTP_204_NO_CONTENT
+    status_code=status.HTTP_204_NO_CONTENT,
+    summary="Desativar usuário (soft delete)",
 )
 async def desactivate_user(
     usuario_id: int,
@@ -126,3 +127,22 @@ async def desactivate_user(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Usuário não encontrado."
         )
+    
+@router.delete(
+    "/delete/{usuario_id}",
+    status_code=status.HTTP_204_NO_CONTENT,
+    summary="Deletar usuário permanentemente",
+)
+async def delete_user(
+    usuario_id: int,
+    db: Session = Depends(get_db)
+):
+    success = usuario_service.delete_permanent_user(db, usuario_id)
+
+    if not success:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Usuário não encontrado."
+        )
+    
+    return {"detail": "Usuário deletado com sucesso."}

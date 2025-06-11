@@ -133,4 +133,15 @@ class UsuarioService:
 
         return True
     
+    def delete_permanent_user(self, db: Session, usuario_id: int) -> bool:
+        db_usuario = self.get_usuario_by_id(db, usuario_id)
+
+        if not db_usuario:
+            return False
+        
+        db.delete(db_usuario)
+        db.commit()
+
+        return True
+    
 usuario_service = UsuarioService()
