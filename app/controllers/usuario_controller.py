@@ -15,7 +15,9 @@ router = APIRouter(
 @router.post(
     "/", 
     response_model=UsuarioResponse, 
-    status_code=status.HTTP_201_CREATED
+    status_code=status.HTTP_201_CREATED,
+    summary="Cria um novo usuário",
+    description="Cria um novo usuário com os dados fornecidos. Retorna os detalhes do usuário criado.",
 )
 async def create_user(
     user: UsuarioCreate,
@@ -26,7 +28,9 @@ async def create_user(
 @router.get(
     "/{usuario_id}",
     response_model=UsuarioResponse,
-    status_code=status.HTTP_200_OK
+    status_code=status.HTTP_200_OK,
+    summary="Obtém usuário por ID",
+    description="Obtém os detalhes de um usuário específico pelo ID fornecido. Retorna um erro 404 se o usuário não for encontrado.",
 )
 async def get_user_by_id(usuario_id: int, db: Session = Depends(get_db)):
     db_usuario = usuario_service.get_usuario_by_id(db, usuario_id)
@@ -42,7 +46,9 @@ async def get_user_by_id(usuario_id: int, db: Session = Depends(get_db)):
 @router.get(
     "/email/{email}",
     response_model=UsuarioResponse,
-    status_code=status.HTTP_200_OK
+    status_code=status.HTTP_200_OK,
+    summary="Obtém usuário por email",
+    description="Obtém os detalhes de um usuário específico pelo email fornecido. Retorna um erro 404 se o usuário não for encontrado.",
 )
 async def get_user_by_email(email: str, db: Session = Depends(get_db)):
     db_usuario = usuario_service.get_usuario_by_email(db, email)
@@ -58,7 +64,9 @@ async def get_user_by_email(email: str, db: Session = Depends(get_db)):
 @router.get(
     "/cpf/{cpf}",
     response_model=UsuarioResponse,
-    status_code=status.HTTP_200_OK
+    status_code=status.HTTP_200_OK,
+    summary="Obtém usuário por CPF",
+    description="Obtém os detalhes de um usuário específico pelo CPF fornecido. Retorna um erro 404 se o usuário não for encontrado.",
 )
 async def get_user_by_cpf(cpf: str, db: Session = Depends(get_db)):
     db_usuario = usuario_service.get_usuario_by_cpf(db, cpf)
@@ -75,6 +83,8 @@ async def get_user_by_cpf(cpf: str, db: Session = Depends(get_db)):
     "/",
     response_model=List[UsuarioResponse],
     status_code=status.HTTP_200_OK,
+    summary="Obtém lista de usuários",
+    description="Obtém uma lista de usuários com opções de paginação e filtragem. Retorna uma lista de usuários ativos ou inativos, dependendo dos parâmetros fornecidos.",
 )
 async def get_users(
     skip: int = Query(0, ge=0, description="Número de registros a serem pulados"),
@@ -94,7 +104,9 @@ async def get_users(
 @router.put(
     "/{usuario_id}",
     response_model=UsuarioResponse,
-    status_code=status.HTTP_200_OK
+    status_code=status.HTTP_200_OK,
+    summary="Atualiza usuário",
+    description="Atualiza os detalhes de um usuário existente com os dados fornecidos. Retorna os detalhes do usuário atualizado.",
 )
 async def update_user(
     usuario_id: int,
@@ -115,6 +127,7 @@ async def update_user(
     "/{usuario_id}",
     status_code=status.HTTP_204_NO_CONTENT,
     summary="Deleta usuário parcialmente (soft delete)",
+    description="Deleta parcialmente um usuário, marcando-o como inativo. Retorna um erro 404 se o usuário não for encontrado.",
 )
 async def desactivate_user(
     usuario_id: int,
@@ -132,6 +145,7 @@ async def desactivate_user(
     "/delete/{usuario_id}",
     status_code=status.HTTP_204_NO_CONTENT,
     summary="Deletar usuário permanentemente",
+    description="Deleta um usuário permanentemente do sistema. Retorna um erro 404 se o usuário não for encontrado.",
 )
 async def delete_user(
     usuario_id: int,
@@ -151,7 +165,8 @@ async def delete_user(
     "/{usuario_id}/deactivate",
     response_model=UsuarioResponse,
     status_code=status.HTTP_200_OK,
-    summary="Desativar usuário (soft delete)"
+    summary="Desativar usuário (soft delete)",
+    description="Desativa um usuário, marcando-o como inativo. Retorna os detalhes do usuário desativado.",
 )
 async def deactivate_user(
     usuario_id: int,
@@ -171,7 +186,8 @@ async def deactivate_user(
     "/{usuario_id}/activate",
     response_model=UsuarioResponse,
     status_code=status.HTTP_200_OK,
-    summary="Ativar usuário"
+    summary="Ativar usuário",
+    description="Ativa um usuário previamente desativado. Retorna os detalhes do usuário ativado.",
 )
 async def activate_user(
     usuario_id: int,
