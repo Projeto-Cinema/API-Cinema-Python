@@ -222,3 +222,31 @@ class TestUsuarioDelete:
         response_get = client.get(f"/api/v1/Users/{user_id}")
         response_data_get = response_get.json()
         assert response_data_get["ativo"] is False
+
+class TestUsuarioPermanentDelete:
+
+    @pytest.fixture
+    def usuario_data(self):
+        return {
+            "nome": "Wesley",
+            "email": "weslin@gmail.com",
+            "cpf": "12345678901",
+            "senha": "senha123",
+            "telefone": "1234567890",
+        }
+    
+    @pytest.fixture
+    def create_user(self, client, usuario_data):
+        response = client.post("api/v1/Users", json=usuario_data)
+        assert response.status_code == status.HTTP_201_CREATED
+        return response.json()
+    
+    def test_delete_user_permanent_integration_success(self, client, create_user):
+        user_id = create_user["id"]
+
+        response_delete = client.delete(f"/api/v1/Users/delete/{user_id}")
+
+        assert response_delete.status_code == status.HTTP_204_NO_CONTENT
+
+        response_get = client.get(f"/api/v1/Users/{user_id}")
+        assert response_get.status_code == status.HTTP_404_NOT_FOUND
