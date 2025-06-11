@@ -3,7 +3,7 @@ from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy.orm import Session
 
 from app.database import get_db
-from app.models.schemas.usuario_schema import UsuarioCreate, UsuarioResponse
+from app.models.schemas.usuario_schema import UsuarioCreate, UsuarioResponse, UsuarioUpdate
 from app.service.usuario_service import usuario_service
 
 
@@ -74,6 +74,7 @@ async def get_user_by_cpf(cpf: str, db: Session = Depends(get_db)):
 @router.get(
     "/",
     response_model=List[UsuarioResponse],
+    status_code=status.HTTP_200_OK,
 )
 async def get_users(
     skip: int = Query(0, ge=0, description="Número de registros a serem pulados"),
@@ -89,3 +90,23 @@ async def get_users(
         ativo=ativo,
         tipo=tipo
     )
+
+@router.put(
+    "/{usuario_id}",
+    response_model=UsuarioResponse,
+    status_code=status.HTTP_200_OK
+)
+async def update_user(
+    usuario_id: int,
+    usuario_data: UsuarioUpdate,
+    db: Session = Depends(get_db)
+):
+    db_usuario = usuario_service.update_usuarios(db, usuario_id, usuario_data)
+
+    if not db_usuario:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Usuário não encontrado."
+        )
+    
+    return db_usuario

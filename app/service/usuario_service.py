@@ -5,7 +5,7 @@ from passlib.context import CryptContext
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import IntegrityError
 
-from app.models.schemas.usuario_schema import UsuarioCreate
+from app.models.schemas.usuario_schema import UsuarioCreate, UsuarioUpdate
 from app.models.usuario import Usuario
 
 class UsuarioService:
@@ -77,5 +77,49 @@ class UsuarioService:
             query = query.filter(Usuario.tipo == tipo)
 
         return query.offset(skip).limit(limit).all()
+    
+    def update_usuarios(
+        self,
+        db: Session,
+        usuario_id: int,
+        usuario_data: UsuarioUpdate
+    ) -> Optional[Usuario]:
+        db_usuario = self.get_usuario_by_id(db, usuario_id)
+
+        if not db_usuario:
+            return None
+        
+        try:
+            update_data = usuario_data.model_dump(exclude_unset=True)
+
+            if 'senha' in update_data:
+                update_data['senha'] = self._hash_password(update_data['senha'])
+
+            for field, value in update_data.items():
+                setattr(db_usuario, field, value)
+
+            db.commit()
+            db.refresh(db_usuario)
+
+            return db_usuario
+        
+        except IntegrityError as e:
+            db.rollback()
+
+            if "email" in str(e.orig):
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    detail="Email já está em uso."
+                ) 
+            elif "cpf" in str(e.orig):
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    detail="CPF já está em uso."
+                )
+            else:
+                raise HTTPException(
+                    status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                    detail="Erro de integridade nos dados."
+                )
     
 usuario_service = UsuarioService()
