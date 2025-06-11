@@ -38,3 +38,33 @@ class TestUsuarioController:
 
         response2 = client.post("api/v1/Users", json=usuario_data)
         assert response2.status_code == status.HTTP_400_BAD_REQUEST
+
+class TestUsuarioGetByID:
+
+    @pytest.fixture
+    def usuario_data(self):
+        return {
+            "nome": "Wesley",
+            "email": "wesley@gmail.com",
+            "senha": "senha123",
+            "telefone": "1234567890"
+        }
+    
+    @pytest.fixture
+    def create_user(self, client, usuario_data):
+        response = client.post("api/v1/Users", json=usuario_data)
+        assert response.status_code == status.HTTP_201_CREATED
+        return response.json()
+    
+    def test_get_user_by_id_integration_success(self, client, create_user):
+        user_id = create_user["id"]
+
+        response = client.get(f"/api/v1/Users/{user_id}")
+
+        assert response.status_code == status.HTTP_200_OK
+
+        response_data = response.json()
+        assert response_data["id"] == user_id
+        assert response_data["nome"] == create_user["nome"]
+        assert response_data["email"] == create_user["email"]
+        assert response_data["telefone"] == create_user["telefone"]
