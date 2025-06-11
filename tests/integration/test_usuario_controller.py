@@ -280,3 +280,32 @@ class TestUsuarioDeactivate:
         response_data = response.json()
         assert response_data["id"] == user_id
         assert response_data["ativo"] is False
+
+class TestUsuarioActivate:
+
+    @pytest.fixture
+    def usuario_data(self):
+        return {
+            "nome": "Wesley",
+            "email": "weslin@gmail.com",
+            "cpf": "12345678901",
+            "senha": "senha123",
+            "ativo": False,
+            "telefone": "1234567890",
+        }
+    
+    @pytest.fixture
+    def create_user(self, client, usuario_data):
+        response = client.post("api/v1/Users", json=usuario_data)
+        assert response.status_code == status.HTTP_201_CREATED
+        return response.json()
+    
+    def test_activate_user_integration_success(self, client, create_user):
+        user_id = create_user["id"]
+
+        response = client.patch(f"/api/v1/Users/{user_id}/activate")
+
+        assert response.status_code == status.HTTP_200_OK
+        response_data = response.json()
+        assert response_data["id"] == user_id
+        assert response_data["ativo"] is True
