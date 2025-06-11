@@ -53,5 +53,8 @@ class UsuarioService:
             
     def get_usuario_by_id(self, db: Session, usuario_id: int) -> Optional[Usuario]:
         return db.query(Usuario).filter(Usuario.id == usuario_id).first()
+
+    def get_usuario_by_email(self, db: Session, email: str) -> Optional[Usuario]:
+        return db.query(Usuario).filter(Usuario.email == email).first()
             
 usuario_service = UsuarioService()
