@@ -1,4 +1,6 @@
+from re import M
 from typing import Dict, List
+from venv import create
 import pytest
 
 from fastapi import status
@@ -154,3 +156,40 @@ class TestUsuarioGetAll:
         assert response.status_code == status.HTTP_200_OK
 
         assert len(response.json()) == len(usuarios_data)
+
+class TestUsuarioUpdate:
+
+    @pytest.fixture
+    def usuario_data(self):
+        return {
+            "nome": "Wesley",
+            "email": "weslin@gmail.com",
+            "cpf": "12345678901",
+            "senha": "senha123",
+            "telefone": "1234567890",
+        }
+    
+    @pytest.fixture
+    def create_user(self, client, usuario_data):
+        response = client.post("api/v1/Users", json=usuario_data)
+        assert response.status_code == status.HTTP_201_CREATED
+        return response.json()
+    
+    def test_update_user_integration_success(self, client, create_user):
+        user_id = create_user["id"]
+
+        response = client.put(f"/api/v1/Users/{user_id}", json={
+            "nome": "Wesley Updated",
+            "email": "weslin@gmail.com",
+            "cpf": "11111111111",
+            "senha": "newpassword123",
+            "telefone": "0987654321"
+        })
+
+        assert response.status_code == status.HTTP_200_OK
+
+        response_data = response.json()
+        assert response_data["id"] == user_id
+        assert response_data["nome"] == "Wesley Updated"
+        assert response_data["nome"] != create_user["nome"]
+        assert response_data["email"] == create_user["email"]
