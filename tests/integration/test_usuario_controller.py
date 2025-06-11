@@ -1,3 +1,4 @@
+from typing import Dict, List
 import pytest
 
 from fastapi import status
@@ -130,3 +131,26 @@ class TestUsuarioGetByCPF:
         assert response_data["email"] == create_user["email"]
         assert response_data["cpf"] == user_cpf
         assert response_data["telefone"] == create_user["telefone"]
+
+class TestUsuarioGetAll:
+
+    @pytest.fixture(scope="class")
+    def usuarios_data(self) -> List[Dict]:
+        return [
+            {"nome": "wesley", "email": "wesley@gmail.com", "cpf": "1111111111", "senha": "senha123", "telefone": "1234567890", "tipo": "cliente", "ativo": True},
+            {"nome": "maria", "email": "maria@gmail.com", "cpf": "2222222222", "senha": "senha123", "telefone": "0987654321", "tipo": "cliente", "ativo": True},
+            {"nome": "joao", "email": "joao@gmail.com", "cpf": "3333333333", "senha": "senha123", "telefone": "1122334455", "tipo": "cliente", "ativo": False},
+        ]
+
+    @pytest.fixture()
+    def create_users(self, client, usuarios_data: List[Dict]):
+        for user_data in usuarios_data:
+            response = client.post("api/v1/Users", json=user_data)
+            assert response.status_code == status.HTTP_201_CREATED
+
+    def test_list_all_users_without_filters(self, client, usuarios_data: List[Dict], create_users):
+        response = client.get("api/v1/Users")
+
+        assert response.status_code == status.HTTP_200_OK
+
+        assert len(response.json()) == len(usuarios_data)
