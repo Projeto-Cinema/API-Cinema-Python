@@ -121,5 +121,16 @@ class UsuarioService:
                     status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                     detail="Erro de integridade nos dados."
                 )
+            
+    def delete_partial_user(self, db: Session, usuario_id: int) -> bool:
+        db_usuario = self.get_usuario_by_id(db, usuario_id)
+
+        if not db_usuario:
+            return False
+        
+        db_usuario.ativo = False
+        db.commit()
+
+        return True
     
 usuario_service = UsuarioService()

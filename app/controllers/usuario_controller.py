@@ -110,3 +110,19 @@ async def update_user(
         )
     
     return db_usuario
+
+@router.delete(
+    "/{usuario_id}",
+    status_code=status.HTTP_204_NO_CONTENT
+)
+async def desactivate_user(
+    usuario_id: int,
+    db: Session = Depends(get_db)
+):
+    success = usuario_service.delete_partial_user(db, usuario_id)
+
+    if not success:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Usuário não encontrado."
+        )
