@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 from sqlalchemy import text
 
 from app.config import settings
-from app.database import get_db, create_tables
+from app.database import get_db, create_tables, initialize_database
 
 from app.models.cinema import Cinema
 from app.models.sala import Sala
@@ -28,7 +28,8 @@ app.include_router(usuario_router, prefix="/api/v1", tags=["Users"])
 @app.on_event("startup")
 async def startup_event():
     try:
-        create_tables()
+        # create_tables()
+        initialize_database()
         print("Tables created successfully.")
         print(f"Database connection established: {settings.DATABASE_URL}")
     except Exception as e:
