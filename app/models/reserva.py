@@ -41,6 +41,5 @@ class ItemReserva(BaseModel):
         "Assento", 
         foreign_keys=[item_id], 
         primaryjoin="and_(ItemReserva.tipo=='assento', ItemReserva.item_id==Assento.id)", 
-        back_populates="item_reserva", 
         viewonly=True
     )

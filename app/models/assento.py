@@ -12,4 +12,3 @@ class Assento(BaseModel):
 
     # Relacionamentos
     sessao = relationship("Sessao", back_populates="assentos")
-    item_reserva = relationship("ItemReserva", back_populates="assento", uselist=False)
