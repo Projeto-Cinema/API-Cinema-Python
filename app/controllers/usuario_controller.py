@@ -166,3 +166,23 @@ async def deactivate_user(
         )
     
     return db_usuario
+
+@router.patch(
+    "/{usuario_id}/activate",
+    response_model=UsuarioResponse,
+    status_code=status.HTTP_200_OK,
+    summary="Ativar usuário"
+)
+async def activate_user(
+    usuario_id: int,
+    db: Session = Depends(get_db)
+):
+    db_usuario = usuario_service.activate_usuario(db, usuario_id)
+
+    if not db_usuario:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Usuário não encontrado."
+        )
+    
+    return db_usuario

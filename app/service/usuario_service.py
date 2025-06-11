@@ -156,4 +156,16 @@ class UsuarioService:
 
         return db_usuario
     
+    def activate_usuario(self, db: Session, usuario_id: int) -> Optional[Usuario]:
+        db_usuario = self.get_usuario_by_id(db, usuario_id)
+
+        if not db_usuario:
+            return None
+        
+        db_usuario.ativo = True
+        db.commit()
+        db.refresh(db_usuario)
+
+        return db_usuario
+    
 usuario_service = UsuarioService()
