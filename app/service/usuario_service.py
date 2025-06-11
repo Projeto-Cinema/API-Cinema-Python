@@ -1,3 +1,4 @@
+from typing import Optional
 from fastapi import HTTPException, status
 from passlib.context import CryptContext
 
@@ -49,5 +50,8 @@ class UsuarioService:
                     status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                     detail="Erro ao criar usuário."
                 )
+            
+    def get_usuario_by_id(self, db: Session, usuario_id: int) -> Optional[Usuario]:
+        return db.query(Usuario).filter(Usuario.id == usuario_id).first()
             
 usuario_service = UsuarioService()

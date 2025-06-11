@@ -1,8 +1,8 @@
-from fastapi import APIRouter, Depends, status
+from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
 from app.database import get_db
-from app.models.schemas.usuario_schema import UsuarioCreate
+from app.models.schemas.usuario_schema import UsuarioCreate, UsuarioResponse
 from app.service.usuario_service import usuario_service
 
 
@@ -13,7 +13,7 @@ router = APIRouter(
 
 @router.post(
     "/", 
-    response_model=UsuarioCreate, 
+    response_model=UsuarioResponse, 
     status_code=status.HTTP_201_CREATED
 )
 async def create_user(
@@ -21,3 +21,19 @@ async def create_user(
     db: Session = Depends(get_db)
 ):
     return usuario_service.create_user(db, user)
+
+@router.get(
+    "/{usuario_id}",
+    response_model=UsuarioResponse,
+    status_code=status.HTTP_200_OK
+)
+async def get_user_by_id(usuario_id: int, db: Session = Depends(get_db)):
+    db_usuario = usuario_service.get_usuario_by_id(db, usuario_id)
+
+    if not db_usuario:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Usuário não encontrado."
+        )
+    
+    return db_usuario
