@@ -1,4 +1,5 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from typing import List, Optional
+from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy.orm import Session
 
 from app.database import get_db
@@ -69,3 +70,22 @@ async def get_user_by_cpf(cpf: str, db: Session = Depends(get_db)):
         )
     
     return db_usuario
+
+@router.get(
+    "/",
+    response_model=List[UsuarioResponse],
+)
+async def get_users(
+    skip: int = Query(0, ge=0, description="Número de registros a serem pulados"),
+    limit: int = Query(100, ge=1, le=1000, description="Limite de registros por página"),
+    ativo: Optional[bool] = Query(None, description="Filtrar por status ativo"),
+    tipo: Optional[bool] = Query(None, description="Filtrar por tipo de usuário"),
+    db: Session = Depends(get_db)
+):
+    return usuario_service.get_usuarios(
+        db,
+        skip=skip,
+        limit=limit,
+        ativo=ativo,
+        tipo=tipo
+    )

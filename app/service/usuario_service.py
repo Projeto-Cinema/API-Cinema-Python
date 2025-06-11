@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import List, Optional
 from fastapi import HTTPException, status
 from passlib.context import CryptContext
 
@@ -59,5 +59,23 @@ class UsuarioService:
     
     def get_usuario_by_cpf(self, db: Session, cpf: str) -> Optional[Usuario]:
         return db.query(Usuario).filter(Usuario.cpf == cpf).first()
-            
+    
+    def get_usuarios(
+        self,
+        db: Session,
+        skip: int = 0,
+        limit: int = 100,
+        ativo: Optional[bool] = None,
+        tipo: Optional[str] = None,
+    ) -> List[Usuario]:
+        query = db.query(Usuario)
+
+        if ativo is not None:
+            query = query.filter(Usuario.ativo == ativo)
+
+        if tipo:
+            query = query.filter(Usuario.tipo == tipo)
+
+        return query.offset(skip).limit(limit).all()
+    
 usuario_service = UsuarioService()
