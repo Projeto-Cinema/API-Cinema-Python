@@ -40,3 +40,22 @@ class TestCinemaControllerGetByID:
         response = client.get("/api/v1/cinema/9999")
 
         assert response.status_code == status.HTTP_404_NOT_FOUND
+
+class TestCinemaControllerGetByName:
+
+    def test_get_cinema_by_name_integration_success(self, client, create_cinema):
+        cinema_name = create_cinema["nome"]
+
+        response = client.get(f"/api/v1/cinema/name/{cinema_name}")
+
+        assert response.status_code == status.HTTP_200_OK
+
+        response_data = response.json()
+        assert response_data["nome"] == cinema_name
+        assert response_data["cnpj"] == create_cinema["cnpj"]
+        assert response_data["endereco_id"] == create_cinema["endereco_id"]
+
+    def test_get_cinema_by_name_not_found(self, client):
+        response = client.get("/api/v1/cinema/name/NonExistentCinema")
+
+        assert response.status_code == status.HTTP_404_NOT_FOUND
