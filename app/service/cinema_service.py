@@ -44,5 +44,8 @@ class CinemaService:
             
     def get_cinema_by_id(self, db: Session, cinema_id: int) -> Optional[Cinema]:
         return db.query(Cinema).filter(Cinema.id == cinema_id).first()
+    
+    def get_cinema_by_name(self, db: Session, name: str) -> Optional[Cinema]:
+        return db.query(Cinema).filter(Cinema.nome == name).first()
 
 cinema_service = CinemaService()
