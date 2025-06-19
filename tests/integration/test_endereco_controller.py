@@ -59,3 +59,36 @@ class TestEnderecoGetByID:
         assert response_data["id"] == address_id
         assert response_data["cep"] == create_address["cep"]
         assert response_data["logradouro"] == create_address["logradouro"]
+
+class TestEnderecoGetByCEP:
+
+    @pytest.fixture
+    def endereco_data(self):
+        return {
+            "cep": "12345678",
+            "logradouro": "Rua Exemplo",
+            "numero": 123,
+            "bairro": "Bairro Exemplo",
+            "cidade": "Cidade Exemplo",
+            "estado": "EX",
+            "complemento": "Apto 1",
+            "referencia": "ref exemplo"
+        }
+    
+    @pytest.fixture
+    def create_address(self, client, endereco_data):
+        response = client.post("api/v1/address", json=endereco_data)
+        assert response.status_code == status.HTTP_201_CREATED
+        return response.json()
+    
+    def test_get_address_by_cep_integration_success(self, client, create_address):
+        cep_data = create_address["cep"]
+
+        response = client.get(f"/api/v1/address/cep/{cep_data}")
+
+        assert response.status_code == status.HTTP_200_OK
+
+        response_data = response.json()
+        assert response_data["id"] == create_address["id"]
+        assert response_data["cep"] == cep_data
+        assert response_data["logradouro"] == create_address["logradouro"]
