@@ -45,7 +45,7 @@ class TestEnderecoGetByID:
     @pytest.fixture
     def create_address(self, client, endereco_data):
         response = client.post("api/v1/address", json=endereco_data)
-        assert response.status_code == status.HTTP_201_CREATEDs
+        assert response.status_code == status.HTTP_201_CREATED
         return response.json()
     
     def test_get_address_by_id_integration_success(self, client, create_address):
