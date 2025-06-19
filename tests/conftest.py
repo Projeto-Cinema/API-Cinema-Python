@@ -83,3 +83,9 @@ def cinema_data(create_address):
         "ativo": True,
         "endereco_id": create_address["id"]
     }
+
+@pytest.fixture(scope="function")
+def create_cinema(client, cinema_data):
+    response = client.post("/api/v1/cinema", json=cinema_data)
+    assert response.status_code == status.HTTP_201_CREATED
+    return response.json()
