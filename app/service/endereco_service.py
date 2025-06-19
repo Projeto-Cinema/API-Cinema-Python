@@ -40,4 +40,7 @@ class EnderecoService:
     def get_address_by_id(self, db: Session, endereco_id: int) -> Optional[Endereco]:
         return db.query(Endereco).filter(Endereco.id == endereco_id).first()
     
+    def get_address_by_cep(self, db: Session, cep: str) -> Optional[Endereco]:
+        return db.query(Endereco).filter(Endereco.cep == cep).first()
+    
 endereco_service = EnderecoService()

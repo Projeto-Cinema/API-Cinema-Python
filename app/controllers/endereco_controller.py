@@ -42,3 +42,21 @@ async def get_address_by_id(usuario_id: int, db: Session = Depends(get_db)):
         )
     
     return db_endereco
+
+@router.get(
+    "/cep/{cep}",
+    response_model=EnderecoResponse,
+    status_code=status.HTTP_200_OK,
+    summary="Obtém endereço por CEP",
+    description="Obtém os detalhes de um endereço específico pelo CEP fornecido. Retorna um erro 404 se o endereço não for encontrado.",
+)
+async def get_address_by_cep(cep: str, db: Session = Depends(get_db)):
+    db_endereco = endereco_service.get_address_by_cep(db, cep)
+
+    if not db_endereco:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Endereço não encontrado."
+        )
+    
+    return db_endereco
