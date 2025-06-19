@@ -69,3 +69,25 @@ class TestCinemaControllerGetAll:
         assert response.status_code == status.HTTP_200_OK
 
         assert len(response.json()) == len(cinemas_data)
+
+class TestCinemaControllerUpdate:
+
+    def test_update_cinema_integration_success(self, client, create_cinema, create_address):
+        cinema_id = create_cinema["id"]
+
+        response = client.put(f"/api/v1/cinema/{cinema_id}", json={
+            "nome": "Cinema Updated",
+            "cnpj": "12.345.678/0001-90",
+            "telefone": "12345623213",
+            "email": "cinemaupdated@gmail.com",
+            "ativo": True,
+            "endereco_id": create_address["id"]
+        })
+
+        assert response.status_code == status.HTTP_200_OK
+
+        response_data = response.json()
+        assert response_data["id"] == cinema_id
+        assert response_data["nome"] == "Cinema Updated"
+        assert response_data["nome"] != create_cinema["nome"]
+        assert response_data["email"] == "cinemaupdated@gmail.com"
