@@ -119,6 +119,24 @@ class CinemaService:
 
         db_cinema.ativo = False
         db.commit()
+
+        return True
+
+    def permanent_delete_cinema(
+        self,
+        db: Session,
+        cinema_id: int
+    ) -> bool:
+        db_cinema = self.get_cinema_by_id(db, cinema_id)
+
+        if not db_cinema:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Cinema não encontrado."
+            )
+
+        db.delete(db_cinema)
+        db.commit()
         
         return True
 

@@ -127,3 +127,21 @@ async def parcial_delete_cinema(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Cinema não encontrado."
         )
+
+@router.delete(
+    "/delete/{cinema_id}",
+    status_code=status.HTTP_204_NO_CONTENT,
+    summary="Deleta cinema",
+    description="Deleta um cinema existente permanentemente. Retorna um erro 404 se o cinema não for encontrado."
+)
+async def delete_cinema(
+    cinema_id: int,
+    db: Session = Depends(get_db)
+):
+    success = cinema_service.permanent_delete_cinema(db, cinema_id)
+
+    if not success:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Cinema não encontrado."
+        )
