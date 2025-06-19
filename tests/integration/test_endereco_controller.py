@@ -1,3 +1,4 @@
+from typing import Dict, List
 import pytest
 
 from fastapi import status
@@ -92,3 +93,49 @@ class TestEnderecoGetByCEP:
         assert response_data["id"] == create_address["id"]
         assert response_data["cep"] == cep_data
         assert response_data["logradouro"] == create_address["logradouro"]
+
+class TestEnderecoGetByAll:
+    
+    @pytest.fixture(scope="class")
+    def enderecos_data(self):
+        return [
+            {
+                "cep": "12345678",
+                "logradouro": "Rua Exemplo",
+                "numero": 123,
+                "bairro": "Bairro Exemplo",
+                "cidade": "Cidade Exemplo",
+                "estado": "EX",
+                "complemento": "Apto 1",
+                "referencia": "ref exemplo",
+            },
+            {
+                "cep": "222222",
+                "logradouro": "Rua Exemplo",
+                "numero": 222,
+                "bairro": "Bairro Exemplo",
+                "cidade": "Cidade Exemplo",
+                "estado": "EX",
+                "complemento": "Apto 1",
+                "referencia": "ref exemplo",
+            }
+        ]
+    
+    @pytest.fixture
+    def create_addresses(self, client, enderecos_data: List[Dict]):
+        for address_data in enderecos_data:
+            response = client.post("api/v1/address", json=address_data)
+            assert response.status_code == status.HTTP_201_CREATED
+
+    def test_list_all_addresses_without_filtering_integration(
+        self,
+        client,
+        enderecos_data: List[Dict],
+        create_addresses,
+    ):
+        response = client.get("api/v1/address")
+
+        assert response.status_code == status.HTTP_200_OK
+
+        assert len(response.json()) == len(enderecos_data)
+        
