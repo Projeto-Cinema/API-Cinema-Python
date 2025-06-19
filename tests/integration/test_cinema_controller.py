@@ -91,3 +91,17 @@ class TestCinemaControllerUpdate:
         assert response_data["nome"] == "Cinema Updated"
         assert response_data["nome"] != create_cinema["nome"]
         assert response_data["email"] == "cinemaupdated@gmail.com"
+
+class TestCinemaControllerDelete:
+
+    def test_parcial_delete_cinema_integration_success(self, client, create_cinema):
+        cinema_id = create_cinema["id"]
+
+        response = client.delete(f"/api/v1/cinema/{cinema_id}")
+
+        assert response.status_code == status.HTTP_204_NO_CONTENT
+
+        # Verify that the cinema is no longer retrievable
+        response = client.get(f"/api/v1/cinema/{cinema_id}")
+        response_data = response.json()
+        assert response_data["ativo"] is False
