@@ -85,7 +85,37 @@ def cinema_data(create_address):
     }
 
 @pytest.fixture(scope="function")
+def cinemas_data(create_address):
+    return [
+        {
+            "nome": "Cinema Exemplo",
+            "cnpj": "12.345.678/0001-90",
+            "telefone": "1234567890",
+            "email": "cinema@gmail.com",
+            "ativo": True,
+            "endereco_id": create_address["id"]
+        },
+        {
+            "nome": "Cinema Exemplo 2",
+            "cnpj": "12.345.678/0001-94",
+            "telefone": "1234567890",
+            "email": "cinema2@gmail.com",
+            "ativo": True,
+            "endereco_id": create_address["id"]
+        },
+    ]
+
+@pytest.fixture(scope="function")
 def create_cinema(client, cinema_data):
     response = client.post("/api/v1/cinema", json=cinema_data)
     assert response.status_code == status.HTTP_201_CREATED
     return response.json()
+
+@pytest.fixture(scope="function")
+def create_cinemas(client, cinemas_data):
+    created_cinemas = []
+    for cinema in cinemas_data:
+        response = client.post("/api/v1/cinema", json=cinema)
+        assert response.status_code == status.HTTP_201_CREATED
+        created_cinemas.append(response.json())
+    return created_cinemas

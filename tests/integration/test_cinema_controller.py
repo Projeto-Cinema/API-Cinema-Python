@@ -1,3 +1,4 @@
+from typing import Dict, List
 import pytest
 
 from fastapi import status
@@ -59,3 +60,12 @@ class TestCinemaControllerGetByName:
         response = client.get("/api/v1/cinema/name/NonExistentCinema")
 
         assert response.status_code == status.HTTP_404_NOT_FOUND
+
+class TestCinemaControllerGetAll:
+
+    def test_get_all_cinemas_integration_success(self, client, cinemas_data: List[Dict], create_cinemas):
+        response = client.get("/api/v1/cinema")
+
+        assert response.status_code == status.HTTP_200_OK
+
+        assert len(response.json()) == len(cinemas_data)
