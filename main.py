@@ -17,6 +17,7 @@ from app.models.usuario import Usuario
 from app.models.endereco import Endereco
 
 from app.controllers.usuario_controller import router as usuario_router
+from app.controllers.endereco_controller import router as endereco_router
 
 app = FastAPI(
     title=settings.PROJECT_NAME,
@@ -24,6 +25,7 @@ app = FastAPI(
     description=settings.PROJECT_DESCRIPTION,
 )
 app.include_router(usuario_router, prefix="/api/v1", tags=["Users"])
+app.include_router(endereco_router, prefix="/api/v1", tags=["Address"])
 
 @app.on_event("startup")
 async def startup_event():
