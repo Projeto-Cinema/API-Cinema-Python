@@ -1,4 +1,4 @@
-from pydantic import BaseModel, EmailStr
+from pydantic import BaseModel
 from typing import Optional
 from datetime import datetime
 
@@ -6,7 +6,7 @@ class CinemaBase(BaseModel):
     nome: str
     cnpj: str
     telefone: Optional[str] = None
-    email: EmailStr
+    email: str
     site : Optional[str] = None
     horario_func: Optional[str] = None
     imagem_url: Optional[str] = None
@@ -19,7 +19,7 @@ class CinemaUpdate(BaseModel):
     nome: Optional[str] = None
     cnpj: Optional[str] = None
     telefone: Optional[str] = None
-    email: Optional[EmailStr] = None
+    email: Optional[str] = None
     site : Optional[str] = None
     horario_func: Optional[str] = None
     imagem_url: Optional[str] = None
