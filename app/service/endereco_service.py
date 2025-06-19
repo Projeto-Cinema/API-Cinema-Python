@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import List, Optional
 from fastapi import HTTPException, status
 from passlib.context import CryptContext
 
@@ -42,5 +42,15 @@ class EnderecoService:
     
     def get_address_by_cep(self, db: Session, cep: str) -> Optional[Endereco]:
         return db.query(Endereco).filter(Endereco.cep == cep).first()
+    
+    def get_all(
+        self,
+        db: Session,
+        skip: int = 0,
+        limit: int = 100,
+    ) -> List[Endereco]:
+        query = db.query(Endereco)
+
+        return query.offset(skip).limit(limit).all()
     
 endereco_service = EnderecoService()

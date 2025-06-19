@@ -1,4 +1,5 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from typing import List
+from fastapi import APIRouter, Depends, HTTPException, Query, status
 
 from sqlalchemy.orm import Session
 
@@ -60,3 +61,17 @@ async def get_address_by_cep(cep: str, db: Session = Depends(get_db)):
         )
     
     return db_endereco
+
+@router.get(
+    "/",
+    response_model=List[EnderecoResponse],
+    status_code=status.HTTP_200_OK,
+    summary="Obtém lista de endereços",
+    description="Obtém uma lista de endereços com paginação. Retorna até 100 endereços por padrão.",
+)
+async def get_addresses(
+    skip: int = Query(0, ge=0, description="Número de registros a serem pulados"),
+    limit: int = Query(100, ge=1, le=1000, description="Número máximo de registros a serem retornados"), 
+    db: Session = Depends(get_db),
+):
+    return endereco_service.get_all(db, skip=skip, limit=limit)
