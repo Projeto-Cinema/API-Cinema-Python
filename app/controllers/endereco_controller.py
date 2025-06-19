@@ -4,7 +4,7 @@ from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy.orm import Session
 
 from app.database import get_db
-from app.models.schemas.endereco_schema import EnderecoCreate, EnderecoResponse
+from app.models.schemas.endereco_schema import EnderecoCreate, EnderecoResponse, EnderecoUpdate
 from app.service.endereco_service import endereco_service
 
 
@@ -75,3 +75,25 @@ async def get_addresses(
     db: Session = Depends(get_db),
 ):
     return endereco_service.get_all(db, skip=skip, limit=limit)
+
+@router.put(
+    "/{address_id}",
+    response_model=EnderecoResponse,
+    status_code=status.HTTP_200_OK,
+    summary="Atualiza um endereço",
+    description="Atualiza os dados de um endereço existente com os dados fornecidos",
+)
+async def update_address(
+    address_id: int,
+    address_data: EnderecoUpdate,
+    db: Session = Depends(get_db)
+):
+    db_address = endereco_service.update_address(db, address_id, address_data)
+
+    if not db_address:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Endereço não encontrado."
+        )
+    
+    return db_address

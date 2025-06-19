@@ -6,7 +6,7 @@ from sqlalchemy.orm import Session
 from sqlalchemy.exc import IntegrityError
 
 from app.models.endereco import Endereco
-from app.models.schemas.endereco_schema import EnderecoCreate
+from app.models.schemas.endereco_schema import EnderecoCreate, EnderecoUpdate
 
 class EnderecoService:
     def __init__(self):
@@ -52,5 +52,41 @@ class EnderecoService:
         query = db.query(Endereco)
 
         return query.offset(skip).limit(limit).all()
+    
+    def update_address(
+        self,
+        db: Session,
+        address_id: int,
+        address_data: EnderecoUpdate
+    ) -> Optional[Endereco]:
+        db_address = self.get_address_by_id(db, address_id)
+
+        if not db_address:
+            return None
+        
+        try:
+            update_data = address_data.model_dump(exclude_unset=True)
+
+            for field, value in update_data.items():
+                setattr(db_address, field, value)
+
+            db.commit()
+            db.refresh(db_address)
+
+            return db_address
+        
+        except IntegrityError as e:
+            db.rollback()
+
+            if "cep" in str(e.orig):
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    detail="CEP já cadastrado."
+                )
+            else:
+                raise HTTPException(
+                    status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                    detail="Erro ao atualizar endereço."
+                )
     
 endereco_service = EnderecoService()

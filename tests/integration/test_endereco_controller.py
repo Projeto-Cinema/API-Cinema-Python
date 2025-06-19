@@ -178,4 +178,4 @@ class TestEnderecoUpdate:
         response_data = response.json()
         assert response_data["id"] == address_id
         assert response_data["logradouro"] == "Rua Atualizada"
-        assert response_data["numero"] == create_address["numero"]
+        assert response_data["numero"] == 456
