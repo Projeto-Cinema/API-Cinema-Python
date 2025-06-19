@@ -1,4 +1,5 @@
-from pydantic import BaseModel
+import re
+from pydantic import BaseModel, field_validator
 from typing import Optional
 from datetime import datetime
 
@@ -11,6 +12,18 @@ class CinemaBase(BaseModel):
     horario_func: Optional[str] = None
     imagem_url: Optional[str] = None
     ativo: bool = True
+
+    @field_validator('email')
+    @classmethod
+    def validate_email(cls, v):
+        if not v:
+            raise ValueError('Email é obrigatório')
+        
+        email_pattern = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
+        if not re.match(email_pattern, v):
+            raise ValueError('Formato de email inválido')
+        
+        return v
 
 class CinemaCreate(CinemaBase):
     endereco_id: int
