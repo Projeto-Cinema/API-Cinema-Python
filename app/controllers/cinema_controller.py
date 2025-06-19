@@ -1,4 +1,5 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from typing import List, Optional
+from fastapi import APIRouter, Depends, HTTPException, Query, status
 
 from sqlalchemy.orm import Session
 
@@ -66,3 +67,23 @@ async def get_cinema_by_name(
         )
     
     return db_cinema
+
+@router.get(
+    "/",
+    response_model=List[CinemaResponse],
+    status_code=status.HTTP_200_OK,
+    summary="Obtém todos os cinemas",
+    description="Obtém uma lista de todos os cinemas cadastrados. Permite filtragem por status ativo/inativo, com paginação."
+)
+async def get_cinemas(
+    skip: int = Query(0, ge=0, description="Número de registros a serem pulados"),
+    limit: int = Query(100, ge=1, le=1000, description="Número máximo de registros a serem retornados"),
+    ativo: Optional[bool] = Query(None, description="Filtrar cinemas ativos ou inativos"),
+    db: Session = Depends(get_db)
+):
+    return cinema_service.get_cinemas(
+        db,
+        skip=skip,
+        limit=limit,
+        ativo=ativo
+    )

@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import List, Optional
 from fastapi import HTTPException, status
 from passlib.context import CryptContext
 
@@ -47,5 +47,19 @@ class CinemaService:
     
     def get_cinema_by_name(self, db: Session, name: str) -> Optional[Cinema]:
         return db.query(Cinema).filter(Cinema.nome == name).first()
+
+    def get_cinemas(
+        self,
+        db: Session,
+        skip: int = 0,
+        limit: int = 100,
+        ativo: Optional[bool] = None
+    ) -> List[Cinema]:
+        query = db.query(Cinema)
+
+        if ativo is not None:
+            query = query.filter(Cinema.ativo == ativo)
+
+        return query.offset(skip).limit(limit).all()
 
 cinema_service = CinemaService()
