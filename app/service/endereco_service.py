@@ -88,5 +88,16 @@ class EnderecoService:
                     status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                     detail="Erro ao atualizar endereço."
                 )
+            
+    def delete_address(self, db: Session, address_id: int) -> bool:
+        db_address = self.get_address_by_id(db, address_id)
+
+        if not db_address:
+            return False
+        
+        db.delete(db_address)
+        db.commit()
+
+        return True
     
 endereco_service = EnderecoService()

@@ -97,3 +97,23 @@ async def update_address(
         )
     
     return db_address
+
+@router.delete(
+    "/delete/{address_id}",
+    status_code=status.HTTP_204_NO_CONTENT,
+    summary="Deleta um endereço",
+    description="Deleta um endereço existente pelo ID fornecido. Retorna um erro 404 se o endereço não for encontrado.",
+)
+async def delete_address(
+    address_id: int,
+    db: Session = Depends(get_db)
+):
+    success = endereco_service.delete_address(db, address_id)
+
+    if not success:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Endereço não encontrado."
+        )
+    
+    return {"detail": "Endereço deletado com sucesso."}

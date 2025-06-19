@@ -204,7 +204,7 @@ class TestEnderecoDelete:
     def test_delete_address_integration_success(self, client, create_address):
         address_id = create_address["id"]
 
-        response = client.delete(f"/api/v1/address/{address_id}")
+        response = client.delete(f"/api/v1/address/delete/{address_id}")
 
         assert response.status_code == status.HTTP_204_NO_CONTENT
 
