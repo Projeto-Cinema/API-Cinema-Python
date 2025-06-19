@@ -109,3 +109,21 @@ async def update_cinema(
         )
     
     return db_cinema
+
+@router.delete(
+    "/{cinema_id}",
+    status_code=status.HTTP_204_NO_CONTENT,
+    summary="Desativa um cinema",
+    description="Desativa um cinema existente. Retorna um erro 404 se não for possível desativar o cinema."
+)
+async def parcial_delete_cinema(
+    cinema_id: int,
+    db: Session = Depends(get_db)
+):
+    success = cinema_service.parcial_delete_cinema(db, cinema_id)
+
+    if not success:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Cinema não encontrado."
+        )

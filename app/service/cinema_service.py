@@ -103,5 +103,23 @@ class CinemaService:
                     status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                     detail="Erro ao atualizar cinema."
                 )
+            
+    def parcial_delete_cinema(
+        self,
+        db: Session,
+        cinema_id: int
+    ) -> bool:
+        db_cinema = self.get_cinema_by_id(db, cinema_id)
+
+        if not db_cinema:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Cinema não encontrado."
+            )
+
+        db_cinema.ativo = False
+        db.commit()
+        
+        return True
 
 cinema_service = CinemaService()
