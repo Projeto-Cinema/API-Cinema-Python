@@ -35,3 +35,8 @@ class TestCinemaControllerGetByID:
         assert response_data["nome"] == create_cinema["nome"]
         assert response_data["cnpj"] == create_cinema["cnpj"]
         assert response_data["endereco_id"] == create_cinema["endereco_id"]
+
+    def test_get_cinema_by_id_not_found(self, client):
+        response = client.get("/api/v1/cinema/9999")
+
+        assert response.status_code == status.HTTP_404_NOT_FOUND
