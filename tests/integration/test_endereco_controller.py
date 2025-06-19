@@ -179,3 +179,34 @@ class TestEnderecoUpdate:
         assert response_data["id"] == address_id
         assert response_data["logradouro"] == "Rua Atualizada"
         assert response_data["numero"] == 456
+
+class TestEnderecoDelete:
+
+    @pytest.fixture
+    def endereco_data(self):
+        return {
+            "cep": "12345678",
+            "logradouro": "Rua Exemplo",
+            "numero": 123,
+            "bairro": "Bairro Exemplo",
+            "cidade": "Cidade Exemplo",
+            "estado": "EX",
+            "complemento": "Apto 1",
+            "referencia": "ref exemplo"
+        }
+    
+    @pytest.fixture
+    def create_address(self, client, endereco_data):
+        response = client.post("api/v1/address", json=endereco_data)
+        assert response.status_code == status.HTTP_201_CREATED
+        return response.json()
+    
+    def test_delete_address_integration_success(self, client, create_address):
+        address_id = create_address["id"]
+
+        response = client.delete(f"/api/v1/address/{address_id}")
+
+        assert response.status_code == status.HTTP_204_NO_CONTENT
+
+        response = client.get(f"/api/v1/address/{address_id}")
+        assert response.status_code == status.HTTP_404_NOT_FOUND
