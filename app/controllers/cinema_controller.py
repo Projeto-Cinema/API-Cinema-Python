@@ -10,7 +10,7 @@ from app.service.cinema_service import cinema_service
 
 router = APIRouter(
     prefix="/cinema",
-    tags=["cinema"],
+    tags=["Cinema"],
 )
 
 @router.post(
