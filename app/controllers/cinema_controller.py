@@ -4,7 +4,7 @@ from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy.orm import Session
 
 from app.database import get_db
-from app.models.schemas.cinema_schema import CinemaCreate, CinemaResponse
+from app.models.schemas.cinema_schema import CinemaCreate, CinemaResponse, CinemaUpdate
 from app.service.cinema_service import cinema_service
 
 
@@ -87,3 +87,25 @@ async def get_cinemas(
         limit=limit,
         ativo=ativo
     )
+
+@router.put(
+    "/{cinema_id}",
+    response_model=CinemaResponse,
+    status_code=status.HTTP_200_OK,
+    summary="Atualiza cinema",
+    description="Atualiza os dados de um cinema existente. Retorna os detalhes atualizados do cinema."
+)
+async def update_cinema(
+    cinema_id: int,
+    cinema_data: CinemaUpdate,
+    db: Session = Depends(get_db)
+):
+    db_cinema = cinema_service.update_cinema(db, cinema_id, cinema_data)
+
+    if not db_cinema:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Cinema não encontrado."
+        )
+    
+    return db_cinema

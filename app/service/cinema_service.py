@@ -6,7 +6,7 @@ from sqlalchemy.orm import Session
 from sqlalchemy.exc import IntegrityError
 
 from app.models.cinema import Cinema
-from app.models.schemas.cinema_schema import CinemaCreate
+from app.models.schemas.cinema_schema import CinemaCreate, CinemaUpdate
 
 class CinemaService:
     def __init__(self):
@@ -61,5 +61,47 @@ class CinemaService:
             query = query.filter(Cinema.ativo == ativo)
 
         return query.offset(skip).limit(limit).all()
+    
+    def update_cinema(
+        self,
+        db: Session,
+        cinema_id: int,
+        cinema_data: CinemaUpdate
+    ) -> Optional[Cinema]:
+        db_cinema = self.get_cinema_by_id(db, cinema_id)
+
+        if not db_cinema:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Cinema não encontrado."
+            )
+
+        try:
+            for key, value in cinema_data.model_dump(exclude_unset=True).items():
+                setattr(db_cinema, key, value)
+
+            db.commit()
+            db.refresh(db_cinema)
+
+            return db_cinema
+        
+        except IntegrityError as e:
+            db.rollback()
+
+            if "cnpj" in str(e.orig):
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    detail="CNPJ já cadastrado."
+                )
+            elif "email" in str(e.orig):
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    detail="Email já cadastrado."
+                )
+            else:
+                raise HTTPException(
+                    status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                    detail="Erro ao atualizar cinema."
+                )
 
 cinema_service = CinemaService()
