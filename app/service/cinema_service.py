@@ -1,3 +1,4 @@
+from typing import Optional
 from fastapi import HTTPException, status
 from passlib.context import CryptContext
 
@@ -41,4 +42,7 @@ class CinemaService:
                     detail="Erro ao criar cinema."
                 )
             
+    def get_cinema_by_id(self, db: Session, cinema_id: int) -> Optional[Cinema]:
+        return db.query(Cinema).filter(Cinema.id == cinema_id).first()
+
 cinema_service = CinemaService()

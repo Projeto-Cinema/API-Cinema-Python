@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, status
+from fastapi import APIRouter, Depends, HTTPException, status
 
 from sqlalchemy.orm import Session
 
@@ -24,3 +24,24 @@ async def create_cinema(
     db: Session = Depends(get_db)
 ):
     return cinema_service.create_cinema(db, cinema)
+
+@router.get(
+    "/{cinema_id}",
+    response_model=CinemaResponse,
+    status_code=status.HTTP_200_OK,
+    summary="Obtém cinema por ID",
+    description="Obtém os detalhes de um cinema específico pelo ID fornecido. Retorna um erro 404 se o cinema não for encontrado."
+)
+async def get_cinema_by_id(
+    cinema_id: int,
+    db: Session = Depends(get_db)
+):
+    db_cinema = cinema_service.get_cinema_by_id(db, cinema_id)
+
+    if not db_cinema:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Cinema não encontrado."
+        )
+    
+    return db_cinema
