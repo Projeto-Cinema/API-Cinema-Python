@@ -1,3 +1,4 @@
+from typing import Optional
 from fastapi import HTTPException, status
 from passlib.context import CryptContext
 
@@ -36,4 +37,7 @@ class EnderecoService:
                     detail="Erro ao criar endereço."
                 )
             
+    def get_address_by_id(self, db: Session, endereco_id: int) -> Optional[Endereco]:
+        return db.query(Endereco).filter(Endereco.id == endereco_id).first()
+    
 endereco_service = EnderecoService()

@@ -24,3 +24,21 @@ async def create_address(
     db: Session = Depends(get_db)
 ):
     return endereco_service.create_endereco(db, address)
+
+@router.get(
+    "/{usuario_id}",
+    response_model=EnderecoResponse,
+    status_code=status.HTTP_200_OK,
+    summary="Obtém endereço por ID",
+    description="Obtém os detalhes de um endereço específico pelo ID fornecido. Retorna um erro 404 se o endereço não for encontrado.",
+)
+async def get_address_by_id(usuario_id: int, db: Session = Depends(get_db)):
+    db_endereco = endereco_service.get_address_by_id(db, usuario_id)
+
+    if not db_endereco:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Endereço não encontrado."
+        )
+    
+    return db_endereco
