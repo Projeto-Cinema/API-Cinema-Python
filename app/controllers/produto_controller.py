@@ -66,3 +66,23 @@ async def get_product_by_name(
         )
     
     return product
+
+@router.get(
+    "/",
+    response_model=list[ProdutoResponse],
+    status_code=status.HTTP_200_OK,
+    summary="Obtém uma lista de produtos",
+    description="Obtém uma lista de produtos com opções de paginação e filtro por ativo."
+)
+async def get_products(
+    skip: int = 0,
+    limit: int = 100,
+    ativo: bool = None,
+    db: Session = Depends(get_db)
+):
+    return produto_service.get_products(
+        db,
+        skip=skip,
+        limit=limit,
+        ativo=ativo
+    )

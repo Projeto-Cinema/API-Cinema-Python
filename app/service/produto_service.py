@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import List, Optional
 from fastapi import HTTPException, status
 from passlib.context import CryptContext
 
@@ -36,5 +36,19 @@ class ProdutoService:
     
     def get_product_by_name(self, db: Session, product_name: str) -> Optional[Produto]:
         return db.query(Produto).filter(Produto.nome == product_name).first()
+    
+    def get_products(
+        self,
+        db: Session,
+        skip: int = 0,
+        limit: int = 100,
+        ativo: Optional[bool] = None
+    ) -> List[Produto]:
+        query = db.query(Produto)
+
+        if ativo is not None:
+            query = query.filter(Produto.ativo == ativo)
+
+        return query.offset(skip).limit(limit).all()
         
 produto_service = ProdutoService()
