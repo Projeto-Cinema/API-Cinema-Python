@@ -6,7 +6,7 @@ from sqlalchemy.orm import Session
 from sqlalchemy.exc import IntegrityError
 
 from app.models import Produto
-from app.models.schemas.produto_schema import ProdutoCreate
+from app.models.schemas.produto_schema import ProdutoCreate, ProdutoUpdate
 
 class ProdutoService:
     def __init__(self):
@@ -50,5 +50,37 @@ class ProdutoService:
             query = query.filter(Produto.ativo == ativo)
 
         return query.offset(skip).limit(limit).all()
+    
+    def update_product(
+        self,
+        db: Session,
+        product_id: int,
+        product_data: ProdutoUpdate
+    ) -> Optional[Produto]:
+        db_product = self.get_product_by_id(db, product_id)
+
+        if not db_product:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Produto não encontrado."
+            )
+        
+        try:
+            for key, value in product_data.model_dump(exclude_unset=True).items():
+                setattr(db_product, key, value)
+
+            db.add(db_product)
+            db.commit()
+            db.refresh(db_product)
+
+            return db_product
+        
+        except IntegrityError as e:
+            db.rollback()
+
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail="Erro ao atualizar produto."
+            )
         
 produto_service = ProdutoService()
