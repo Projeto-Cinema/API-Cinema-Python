@@ -40,3 +40,10 @@ class TestProdutoControllerGetProduct:
         response_data = response.json()
         assert response_data["nome"] == product_name
         assert response_data["preco"] == create_product["preco"]
+
+    def test_get_all_products_integration_success(self, client, create_products):
+        response = client.get("/api/v1/products")
+
+        assert response.status_code == status.HTTP_200_OK
+
+        assert len(response.json()) == len(create_products)

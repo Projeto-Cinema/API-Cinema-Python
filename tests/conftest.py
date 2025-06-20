@@ -133,7 +133,39 @@ def product_payload(create_cinema):
     }
 
 @pytest.fixture(scope="function")
+def products_data(create_cinema):
+    return [
+        {
+            "nome": "Produto Exemplo 1",
+            "descricao": "Descrição do produto exemplo 1",
+            "categoria": "Doces",
+            "preco": 19.99,
+            "imagem_url": "http://example.com/imagem1.jpg",
+            "disponivel": True,
+            "cinema_id": create_cinema["id"]
+        },
+        {
+            "nome": "Produto Exemplo 2",
+            "descricao": "Descrição do produto exemplo 2",
+            "categoria": "Bebidas",
+            "preco": 9.99,
+            "imagem_url": "http://example.com/imagem2.jpg",
+            "disponivel": True,
+            "cinema_id": create_cinema["id"]
+        }
+    ]
+
+@pytest.fixture(scope="function")
 def create_product(client, product_payload):
     response = client.post("/api/v1/products", json=product_payload)
     assert response.status_code == status.HTTP_201_CREATED
     return response.json()
+
+@pytest.fixture(scope="function")
+def create_products(client, products_data):
+    created_products = []
+    for product in products_data:
+        response = client.post("/api/v1/products", json=product)
+        assert response.status_code == status.HTTP_201_CREATED
+        created_products.append(response.json())
+    return created_products
