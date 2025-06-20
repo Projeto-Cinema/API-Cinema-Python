@@ -11,7 +11,7 @@ class TestProdutoController:
         assert response_data["nome"] == product_payload["nome"]
         assert response_data["preco"] == product_payload["preco"]
 
-class TestProdutoControllerGetByID:
+class TestProdutoControllerGetProduct:
 
     def test_get_product_by_id_integration_success(self, client, create_product):
         product_id = create_product["id"]
@@ -29,3 +29,14 @@ class TestProdutoControllerGetByID:
         response = client.get("/api/v1/products/9999")
 
         assert response.status_code == status.HTTP_404_NOT_FOUND
+
+    def test_get_product_by_name_integration_success(self, client, create_product):
+        product_name = create_product["nome"]
+
+        response = client.get(f"/api/v1/products/name/{product_name}")
+
+        assert response.status_code == status.HTTP_200_OK
+
+        response_data = response.json()
+        assert response_data["nome"] == product_name
+        assert response_data["preco"] == create_product["preco"]
