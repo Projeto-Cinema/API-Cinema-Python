@@ -1,3 +1,4 @@
+from typing import Optional
 from fastapi import HTTPException, status
 from passlib.context import CryptContext
 
@@ -29,5 +30,8 @@ class ProdutoService:
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                 detail="Erro ao criar produto."
             )
+        
+    def get_product_by_id(self, db: Session, product_id: int) -> Optional[Produto]:
+        return db.query(Produto).filter(Produto.id == product_id).first()
         
 produto_service = ProdutoService()

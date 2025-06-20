@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, status
+from fastapi import APIRouter, Depends, HTTPException, status
 
 from sqlalchemy.orm import Session
 
@@ -24,3 +24,24 @@ async def create_product(
     db: Session = Depends(get_db)
 ):
     return produto_service.create_product(db, product)
+
+@router.get(
+    "/{product_id}",
+    response_model=ProdutoResponse,
+    status_code=status.HTTP_200_OK,
+    summary="Obtém um produto por ID",
+    description="Obtém os detalhes de um produto específico pelo seu ID."
+)
+async def get_product_by_id(
+    product_id: int,
+    db: Session = Depends(get_db)
+):
+    product = produto_service.get_product_by_id(db, product_id)
+    
+    if not product:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Produto não encontrado."
+        )
+    
+    return product
