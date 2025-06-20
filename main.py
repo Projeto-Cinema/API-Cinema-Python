@@ -19,6 +19,7 @@ from app.models.endereco import Endereco
 from app.controllers.usuario_controller import router as usuario_router
 from app.controllers.endereco_controller import router as endereco_router
 from app.controllers.cinema_controller import router as cinema_router
+from app.controllers.produto_controller import router as produto_router
 
 app = FastAPI(
     title=settings.PROJECT_NAME,
@@ -29,6 +30,7 @@ app = FastAPI(
 app.include_router(usuario_router, prefix="/api/v1", tags=["Users"])
 app.include_router(endereco_router, prefix="/api/v1", tags=["Address"])
 app.include_router(cinema_router, prefix="/api/v1", tags=["Cinema"])
+app.include_router(produto_router, prefix="/api/v1", tags=["Products"])
 
 @app.on_event("startup")
 async def startup_event():
