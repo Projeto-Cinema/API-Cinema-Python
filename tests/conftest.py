@@ -119,3 +119,21 @@ def create_cinemas(client, cinemas_data):
         assert response.status_code == status.HTTP_201_CREATED
         created_cinemas.append(response.json())
     return created_cinemas
+
+@pytest.fixture(scope="function")
+def product_payload(create_cinema):
+    return {
+        "nome": "Produto Exemplo",
+        "descricao": "Descrição do produto exemplo",
+        "categoria": "Doces",
+        "preco": 19.99,
+        "imagem_url": "http://example.com/imagem.jpg",
+        "disponivel": True,
+        "cinema_id": create_cinema["id"]
+    }
+
+@pytest.fixture(scope="function")
+def create_product(client, product_payload):
+    response = client.post("/api/v1/products", json=product_payload)
+    assert response.status_code == status.HTTP_201_CREATED
+    return response.json()
