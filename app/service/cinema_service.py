@@ -79,7 +79,8 @@ class CinemaService:
         try:
             for key, value in cinema_data.model_dump(exclude_unset=True).items():
                 setattr(db_cinema, key, value)
-
+            
+            db.add(db_cinema)
             db.commit()
             db.refresh(db_cinema)
 
