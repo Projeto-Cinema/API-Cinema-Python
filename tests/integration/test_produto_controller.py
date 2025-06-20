@@ -47,3 +47,25 @@ class TestProdutoControllerGetProduct:
         assert response.status_code == status.HTTP_200_OK
 
         assert len(response.json()) == len(create_products)
+
+class TestProdutoControllerUpdate:
+
+    def test_update_product_integration_success(self, client, create_product):
+        product_id = create_product["id"]
+        update_payload = {
+            "nome": "Produto Atualizado",
+            "descricao": "Descrição atualizada",
+            "categoria": "Bebidas",
+            "preco": 29.99,
+            "imagem_url": "http://example.com/imagem_atualizada.jpg",
+            "disponivel": False
+        }
+
+        response = client.put(f"/api/v1/products/{product_id}", json=update_payload)
+
+        assert response.status_code == status.HTTP_200_OK
+
+        response_data = response.json()
+        assert response_data["nome"] == update_payload["nome"]
+        assert response_data["preco"] == update_payload["preco"]
+        assert response_data["disponivel"] == update_payload["disponivel"]
