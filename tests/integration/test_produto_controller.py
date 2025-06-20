@@ -83,3 +83,14 @@ class TestProdutoControllerDelete:
         response_check = client.get(f"/api/v1/products/{product_id}")
         response_data = response_check.json()
         assert response_data["disponivel"] is False
+
+    def test_permanent_delete_product_integration_success(self, client, create_product):
+        product_id = create_product["id"]
+
+        response = client.delete(f"/api/v1/products/delete/{product_id}")
+
+        assert response.status_code == status.HTTP_204_NO_CONTENT
+
+        # Verifica se o produto foi desativado
+        response_check = client.get(f"/api/v1/products/{product_id}")
+        assert response_check.status_code == status.HTTP_404_NOT_FOUND
