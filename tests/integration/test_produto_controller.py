@@ -69,3 +69,17 @@ class TestProdutoControllerUpdate:
         assert response_data["nome"] == update_payload["nome"]
         assert response_data["preco"] == update_payload["preco"]
         assert response_data["disponivel"] == update_payload["disponivel"]
+
+class TestProdutoControllerDelete:
+
+    def test_parcial_delete_product_integration_success(self, client, create_product):
+        product_id = create_product["id"]
+
+        response = client.delete(f"/api/v1/products/{product_id}")
+
+        assert response.status_code == status.HTTP_204_NO_CONTENT
+
+        # Verifica se o produto foi desativado
+        response_check = client.get(f"/api/v1/products/{product_id}")
+        response_data = response_check.json()
+        assert response_data["disponivel"] is False
