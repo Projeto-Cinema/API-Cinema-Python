@@ -10,3 +10,22 @@ class TestProdutoController:
         response_data = response.json()
         assert response_data["nome"] == product_payload["nome"]
         assert response_data["preco"] == product_payload["preco"]
+
+class TestProdutoControllerGetByID:
+
+    def test_get_product_by_id_integration_success(self, client, create_product):
+        product_id = create_product["id"]
+
+        response = client.get(f"/api/v1/products/{product_id}")
+
+        assert response.status_code == status.HTTP_200_OK
+
+        response_data = response.json()
+        assert response_data["id"] == product_id
+        assert response_data["nome"] == create_product["nome"]
+        assert response_data["preco"] == create_product["preco"]
+
+    def test_get_product_by_id_not_found(self, client):
+        response = client.get("/api/v1/products/9999")
+
+        assert response.status_code == status.HTTP_404_NOT_FOUND
