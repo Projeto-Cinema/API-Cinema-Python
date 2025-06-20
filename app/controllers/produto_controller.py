@@ -45,3 +45,24 @@ async def get_product_by_id(
         )
     
     return product
+
+@router.get(
+    "/name/{product_name}",
+    response_model=ProdutoResponse,
+    status_code=status.HTTP_200_OK,
+    summary="Obtém um produto por nome",
+    description="Obtém os detalhes de um produto específico pelo seu nome."
+)
+async def get_product_by_name(
+    product_name: str,
+    db: Session = Depends(get_db)
+):
+    product = produto_service.get_product_by_name(db, product_name)
+    
+    if not product:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Produto não encontrado."
+        )
+    
+    return product

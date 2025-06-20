@@ -33,5 +33,8 @@ class ProdutoService:
         
     def get_product_by_id(self, db: Session, product_id: int) -> Optional[Produto]:
         return db.query(Produto).filter(Produto.id == product_id).first()
+    
+    def get_product_by_name(self, db: Session, product_name: str) -> Optional[Produto]:
+        return db.query(Produto).filter(Produto.nome == product_name).first()
         
 produto_service = ProdutoService()
