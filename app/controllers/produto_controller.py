@@ -108,3 +108,23 @@ async def update_product(
         )
     
     return db_product
+
+@router.delete(
+    "/{product_id}",
+    status_code=status.HTTP_204_NO_CONTENT,
+    summary="Desativa um produto",
+    description="Desativa um produto existente pelo seu ID. Retorna 204 No Content se a operação for bem-sucedida."
+)
+async def parcial_delete_product(
+    product_id: int,
+    db: Session = Depends(get_db)
+):
+    success = produto_service.partial_delete_product(db, product_id)
+
+    if not success:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Produto não encontrado."
+        )
+    
+    return {"detail": "Produto desativado com sucesso."}

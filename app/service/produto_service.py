@@ -82,5 +82,25 @@ class ProdutoService:
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                 detail="Erro ao atualizar produto."
             )
+
+    def partial_delete_product(
+        self,
+        db: Session,
+        product_id: int
+    ) -> bool:
+        db_product = self.get_product_by_id(db, product_id)
+
+        if not db_product:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Produto não encontrado."
+            )
+        
+        db_product.disponivel = False
+        db.add(db_product)
+        db.commit()
+        db.refresh(db_product)
+
+        return True
         
 produto_service = ProdutoService()
