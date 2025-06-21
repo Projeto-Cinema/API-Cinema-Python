@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import List, Optional
 from fastapi import HTTPException, status
 from passlib.context import CryptContext
 
@@ -33,5 +33,19 @@ class SalaService:
         
     def get_room_by_id(self, db: Session, room_id: int) -> Optional[Sala]:
         return db.query(Sala).filter(Sala.id == room_id).first()
+    
+    def get_all_rooms(
+        self,
+        db: Session,
+        skip: int = 0,
+        limit: int = 100,
+        ativo: Optional[bool] = None
+    ) -> List[Sala]:
+        query = db.query(Sala)
+
+        if ativo is not None:
+            query = query.filter(Sala.status == ativo)
+
+        return query.offset(skip).limit(limit).all()
         
 sala_service = SalaService()

@@ -1,4 +1,5 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from typing import Optional
+from fastapi import APIRouter, Depends, HTTPException, Query, status
 
 from sqlalchemy.orm import Session
 
@@ -45,3 +46,18 @@ async def get_room_by_id(
         )
     
     return db_room
+
+@router.get(
+    "/",
+    response_model=list[SalaResponse],
+    status_code=status.HTTP_200_OK,
+    summary="Obtém todas as salas",
+    description="Obtém uma lista de todas as salas, com opções de paginação e filtro por status ativo.",
+)
+async def get_all_rooms(
+    db: Session = Depends(get_db),
+    skip: int = Query(0, ge=0, description="Número de registros a serem pulados para paginação"),
+    limit: int = Query(100, ge=1, le=100, description="Número máximo de registros a serem retornados"),
+    ativo: Optional[bool] = Query(None, description="Filtrar salas ativas (True) ou inativas (False), se fornecido")
+):
+    return sala_service.get_all_rooms(db, skip=skip, limit=limit, ativo=ativo)
