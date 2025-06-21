@@ -1,6 +1,7 @@
-from typing import Optional
+from typing import Optional, List
 from pydantic import BaseModel, Field
 
+from app.models.schemas.genero_schema import Genero
 
 class FilmeBase(BaseModel):
     titulo: str
@@ -9,13 +10,12 @@ class FilmeBase(BaseModel):
     duracao_min: int = Field(ge=1)
     diretor: str
     elenco: str
-    generos: list[str]
     classificacao: str
-    ano_lancamento: int = Field(ge=1)
+    ano_lancamento: int = Field(ge=1900)
     em_cartaz: bool = True
 
 class FilmeCreate(FilmeBase):
-    pass
+    generos_id: List[int] = Field(..., description="Lista de IDs dos gêneros associados ao filme")
 
 class FilmeUpdate(BaseModel):
     titulo: Optional[str] = None
@@ -24,13 +24,13 @@ class FilmeUpdate(BaseModel):
     duracao_min: Optional[int] = Field(None, ge=1)
     diretor: Optional[str] = None
     elenco: Optional[str] = None
-    generos: Optional[str] = None
     classificacao: Optional[str] = None
-    ano_lancamento: Optional[int] = Field(None, ge=1)
+    ano_lancamento: Optional[int] = Field(None, ge=1900)
     em_cartaz: Optional[bool] = None
 
 class FilmeResponse(FilmeBase):
     id: int
+    generos: List[Genero] = Field(..., description="Lista de nomes dos gêneros associados ao filme")
 
     class Config:
         from_attributes = True
