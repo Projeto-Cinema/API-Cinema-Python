@@ -96,5 +96,19 @@ class SalaService:
         db.commit()
 
         return True
+    
+    def delete_room(self, db: Session, room_id: int) -> bool:
+        db_room = self.get_room_by_id(db, room_id)
+
+        if not db_room:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Sala não encontrada."
+            )
+
+        db.delete(db_room)
+        db.commit()
+
+        return True
         
 sala_service = SalaService()
