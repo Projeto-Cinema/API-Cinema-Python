@@ -4,7 +4,7 @@ from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy.orm import Session
 
 from app.database import get_db
-from app.models.schemas.sala_schema import SalaCreate, SalaResponse
+from app.models.schemas.sala_schema import SalaCreate, SalaResponse, SalaUpdate
 from app.service.sala_service import sala_service
 
 
@@ -61,3 +61,25 @@ async def get_all_rooms(
     ativo: Optional[bool] = Query(None, description="Filtrar salas ativas (True) ou inativas (False), se fornecido")
 ):
     return sala_service.get_all_rooms(db, skip=skip, limit=limit, ativo=ativo)
+
+@router.put(
+    "/{room_id}",
+    response_model=SalaResponse,
+    status_code=status.HTTP_200_OK,
+    summary="Atualiza uma sala",
+    description="Atualiza os dados de uma sala existente pelo ID fornecido. Retorna os detalhes da sala atualizada.",
+)
+async def update_room(
+    room_id: int,
+    room_data: SalaUpdate,
+    db: Session = Depends(get_db)
+):
+    db_room = sala_service.update_room(db, room_id, room_data)
+
+    if not db_room:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Sala não encontrada."
+        )
+    
+    return db_room

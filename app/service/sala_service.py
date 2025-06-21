@@ -6,7 +6,7 @@ from sqlalchemy.orm import Session
 from sqlalchemy.exc import IntegrityError
 
 from app.models import Sala
-from app.models.schemas.sala_schema import SalaCreate
+from app.models.schemas.sala_schema import SalaCreate, SalaUpdate
 
 class SalaService:
     def __init__(self):
@@ -47,5 +47,38 @@ class SalaService:
             query = query.filter(Sala.status == ativo)
 
         return query.offset(skip).limit(limit).all()
+    
+    def update_room(
+        self,
+        db: Session,
+        room_id: int,
+        room_data: SalaUpdate
+    ) -> Optional[Sala]:
+        db_room = self.get_room_by_id(db, room_id)
+
+        if not db_room:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Sala não encontrada."
+            )
+
+        try:
+            room_dict = room_data.model_dump(exclude_unset=True)
+            for key, value in room_dict.items():
+                setattr(db_room, key, value)
+
+            db.add(db_room)
+            db.commit()
+            db.refresh(db_room)
+
+            return db_room
+        
+        except IntegrityError as e:
+            db.rollback()
+
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail="Erro ao atualizar sala."
+            )
         
 sala_service = SalaService()
