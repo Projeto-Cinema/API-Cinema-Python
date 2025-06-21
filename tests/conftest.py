@@ -181,3 +181,9 @@ def sala_data(create_cinema):
         "status": StatusSalaEnum.ATIVA,
         "cinema_id": create_cinema["id"]
     }
+
+@pytest.fixture(scope="function")
+def create_sala(client, sala_data):
+    response = client.post("/api/v1/room", json=sala_data)
+    assert response.status_code == status.HTTP_201_CREATED
+    return response.json()
