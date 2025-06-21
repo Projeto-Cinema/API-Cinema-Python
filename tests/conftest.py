@@ -183,7 +183,39 @@ def sala_data(create_cinema):
     }
 
 @pytest.fixture(scope="function")
+def salas_data(create_cinema):
+    return [
+        {
+            "nome": "Sala A1",
+            "capacidade": 100,
+            "tipo": "IMAX",
+            "recursos": '{"projetor": "4K", "som": "Dolby Atmos"}',
+            "mapa_assentos": '{"A": [1, 2, 3], "B": [1, 2, 3]}',
+            "status": StatusSalaEnum.ATIVA,
+            "cinema_id": create_cinema["id"]
+        },
+        {
+            "nome": "Sala B1",
+            "capacidade": 150,
+            "tipo": "3D",
+            "recursos": '{"projetor": "HD", "som": "Surround"}',
+            "mapa_assentos": '{"A": [1, 2, 3], "B": [1, 2, 3]}',
+            "status": StatusSalaEnum.INATIVO,
+            "cinema_id": create_cinema["id"]
+        }
+    ]
+
+@pytest.fixture(scope="function")
 def create_sala(client, sala_data):
     response = client.post("/api/v1/room", json=sala_data)
     assert response.status_code == status.HTTP_201_CREATED
     return response.json()
+
+@pytest.fixture(scope="function")
+def create_rooms(client, salas_data):
+    created_rooms = []
+    for rooms in salas_data:
+        response = client.post("/api/v1/room", json=rooms)
+        assert response.status_code == status.HTTP_201_CREATED
+        created_rooms.append(response.json())
+    return created_rooms

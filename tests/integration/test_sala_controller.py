@@ -1,3 +1,4 @@
+from typing import Dict, List
 from fastapi import status
 
 class TestSalaControllerCreate:
@@ -31,3 +32,10 @@ class TestSalaControllerGet:
         response = client.get("/api/v1/room/9999")
 
         assert response.status_code == status.HTTP_404_NOT_FOUND
+
+    def test_get_all_salas_integration_success(self, client, salas_data: List[Dict], create_rooms):
+        response = client.get("/api/v1/room")
+
+        assert response.status_code == status.HTTP_200_OK
+
+        assert len(response.json()) == len(salas_data)
