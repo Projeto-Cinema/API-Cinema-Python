@@ -76,3 +76,16 @@ class TestSalaControllerUpdate:
         response = client.put("/api/v1/room/9999", json=updated_data)
 
         assert response.status_code == status.HTTP_404_NOT_FOUND
+
+class TestSalaControllerDelete:
+
+    def test_parcial_delete_sala_integration_success(self, client, create_sala):
+        sala_id = create_sala["id"]
+
+        response = client.delete(f"/api/v1/room/{sala_id}")
+
+        assert response.status_code == status.HTTP_204_NO_CONTENT
+
+        response = client.get(f"/api/v1/room/{sala_id}")
+        response_data = response.json()
+        assert response_data["status"] == StatusSalaEnum.INATIVO
