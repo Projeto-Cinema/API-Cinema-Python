@@ -1,3 +1,4 @@
+from re import M
 from fastapi.testclient import TestClient
 from fastapi import status
 
@@ -7,6 +8,7 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.pool import StaticPool
 
+from app.models.genero import Genero
 from app.models.schemas.enum.enum_util import StatusSalaEnum
 from main import app
 from app.database import Base, get_db
@@ -219,3 +221,33 @@ def create_rooms(client, salas_data):
         assert response.status_code == status.HTTP_201_CREATED
         created_rooms.append(response.json())
     return created_rooms
+
+@pytest.fixture(scope="function")
+def create_generos(db_session):
+    from app.models.genero import Genero
+    
+    genero1 = Genero(nome="Ação")
+    genero2 = Genero(nome="Comédia")
+
+    db_session.add_all([genero1, genero2])
+    db_session.commit()
+
+    db_session.refresh(genero1)
+    db_session.refresh(genero2)
+
+    return [genero1.id, genero2.id]
+
+@pytest.fixture(scope="function")
+def filme_data(create_generos):
+    return {
+        "titulo": "Filme exemplo",
+        "titulo_original": "Original Example",
+        "sinopse": "Sinopse do filme exemplo",
+        "duracao_min": 120,
+        "diretor": "Diretor Exemplo",
+        "elenco": "Ator 1, Ator 2",
+        "classificacao": "12 anos",
+        "ano_lancamento": 2023,
+        "em_cartaz": True,
+        "generos_id": create_generos,
+    }
