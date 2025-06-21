@@ -27,3 +27,15 @@ class TestFilmeControllerGet:
         response_data = response.json()
         assert response_data["id"] == movie_id
         assert response_data["titulo"] == create_movie["titulo"]
+
+    def test_get_movie_by_title_integration_success(self, client, create_movie):
+        movie_title = create_movie["titulo"]
+
+        response = client.get(f"/api/v1/movies?titulo={movie_title}")
+
+        assert response.status_code == status.HTTP_200_OK
+        response_data = response.json()
+
+        assert response_data["titulo"] == movie_title
+        assert response_data["id"] == create_movie["id"]
+        assert response_data["duracao_min"] == create_movie["duracao_min"]
