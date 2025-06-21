@@ -83,3 +83,21 @@ async def update_room(
         )
     
     return db_room
+
+@router.delete(
+    "/{room_id}",
+    status_code=status.HTTP_204_NO_CONTENT,
+    summary="Soft delete de sala",
+    description="Realiza um soft delete de uma sala pelo ID fornecido. Retorna 204 No Content se a operação for bem-sucedida.",
+)
+async def soft_delete_room(
+    room_id: int,
+    db: Session = Depends(get_db)
+):
+    success = sala_service.parcial_delete_room(db, room_id)
+
+    if not success:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Sala não encontrada."
+        )

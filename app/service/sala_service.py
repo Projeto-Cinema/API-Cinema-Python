@@ -6,6 +6,7 @@ from sqlalchemy.orm import Session
 from sqlalchemy.exc import IntegrityError
 
 from app.models import Sala
+from app.models.schemas.enum.enum_util import StatusSalaEnum
 from app.models.schemas.sala_schema import SalaCreate, SalaUpdate
 
 class SalaService:
@@ -80,5 +81,20 @@ class SalaService:
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                 detail="Erro ao atualizar sala."
             )
+        
+    def parcial_delete_room(self, db: Session, room_id: int) -> bool:
+        db_room = self.get_room_by_id(db, room_id)
+
+        if not db_room:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Sala não encontrada."
+            )
+
+        db_room.status = StatusSalaEnum.INATIVO
+        db.add(db_room)
+        db.commit()
+
+        return True
         
 sala_service = SalaService()
