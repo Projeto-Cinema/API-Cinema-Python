@@ -7,7 +7,8 @@ from app.database import get_db, create_tables, initialize_database
 
 from app.models.cinema import Cinema
 from app.models.sala import Sala
-from app.models.filme import Filme
+from app.models.filme import Filme, filme_genero
+from app.models.genero import Genero
 from app.models.Produto import Produto
 from app.models.pagamento import Pagamento
 from app.models.reserva import Reserva, ItemReserva
@@ -21,6 +22,7 @@ from app.controllers.endereco_controller import router as endereco_router
 from app.controllers.cinema_controller import router as cinema_router
 from app.controllers.produto_controller import router as produto_router
 from app.controllers.sala_controller import router as sala_router
+from app.controllers.filme_controller import router as filme_router
 
 app = FastAPI(
     title=settings.PROJECT_NAME,
@@ -33,6 +35,7 @@ app.include_router(endereco_router, prefix="/api/v1", tags=["Address"])
 app.include_router(cinema_router, prefix="/api/v1", tags=["Cinema"])
 app.include_router(produto_router, prefix="/api/v1", tags=["Products"])
 app.include_router(sala_router, prefix="/api/v1", tags=["Room"])
+app.include_router(filme_router, prefix="/api/v1", tags=["Movies"])
 
 @app.on_event("startup")
 async def startup_event():
