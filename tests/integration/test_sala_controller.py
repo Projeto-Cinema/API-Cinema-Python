@@ -1,6 +1,8 @@
 from typing import Dict, List
 from fastapi import status
 
+from app.models.schemas.enum.enum_util import StatusSalaEnum
+
 class TestSalaControllerCreate:
 
     def test_create_sala_integration_success(self, client, sala_data):
@@ -39,3 +41,38 @@ class TestSalaControllerGet:
         assert response.status_code == status.HTTP_200_OK
 
         assert len(response.json()) == len(salas_data)
+
+class TestSalaControllerUpdate:
+
+    def test_update_sala_integration_success(self, client, create_sala):
+        sala_id = create_sala["id"]
+        updated_data = {
+            "nome": "Sala Atualizada",
+            "capacidade": 120,
+            "tipo": "IMAX",
+            "recursos": '{"projetor": "4K", "som": "Dolby Atmos"}',
+            "mapa_assentos": '{"A": [1, 2, 3], "B": [1, 2, 3]}',
+            "status": StatusSalaEnum.ATIVA
+        }
+
+        response = client.put(f"/api/v1/room/{sala_id}", json=updated_data)
+
+        assert response.status_code == status.HTTP_200_OK
+
+        response_data = response.json()
+        assert response_data["nome"] == updated_data["nome"]
+        assert response_data["capacidade"] == updated_data["capacidade"]
+
+    def test_update_sala_not_found(self, client):
+        updated_data = {
+            "nome": "Sala Inexistente",
+            "capacidade": 100,
+            "tipo": "IMAX",
+            "recursos": '{"projetor": "4K", "som": "Dolby Atmos"}',
+            "mapa_assentos": '{"A": [1, 2, 3], "B": [1, 2, 3]}',
+            "status": StatusSalaEnum.ATIVA
+        }
+
+        response = client.put("/api/v1/room/9999", json=updated_data)
+
+        assert response.status_code == status.HTTP_404_NOT_FOUND
