@@ -46,5 +46,8 @@ class FilmeService:
 
     def get_movie_by_id(self, db: Session, movie_id: int) -> Optional[Filme]:
         return db.query(Filme).filter(Filme.id == movie_id).first()
+    
+    def get_movie_by_title(self, db: Session, title: str) -> Optional[Filme]:
+        return db.query(Filme).filter(Filme.titulo == title).first()
         
 filme_service = FilmeService()
