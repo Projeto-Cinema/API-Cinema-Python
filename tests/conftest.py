@@ -3,11 +3,11 @@ from fastapi import status
 
 import pytest
 
-from setuptools import find_packages
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.pool import StaticPool
 
+from app.models.schemas.enum.enum_util import StatusSalaEnum
 from main import app
 from app.database import Base, get_db
 
@@ -169,3 +169,15 @@ def create_products(client, products_data):
         assert response.status_code == status.HTTP_201_CREATED
         created_products.append(response.json())
     return created_products
+
+@pytest.fixture(scope="function")
+def sala_data(create_cinema):
+    return {
+        "nome": "Sala A1",
+        "capacidade": 100,
+        "tipo": "IMAX",
+        "recursos": '{"projetor": "4K", "som": "Dolby Atmos"}',
+        "mapa_assentos": '{"A": [1, 2, 3], "B": [1, 2, 3]}',
+        "status": StatusSalaEnum.ATIVA,
+        "cinema_id": create_cinema["id"]
+    }
