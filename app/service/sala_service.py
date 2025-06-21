@@ -1,3 +1,4 @@
+from typing import Optional
 from fastapi import HTTPException, status
 from passlib.context import CryptContext
 
@@ -29,5 +30,8 @@ class SalaService:
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                 detail="Erro ao criar sala."
             )
+        
+    def get_room_by_id(self, db: Session, room_id: int) -> Optional[Sala]:
+        return db.query(Sala).filter(Sala.id == room_id).first()
         
 sala_service = SalaService()
