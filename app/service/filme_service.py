@@ -1,3 +1,4 @@
+from typing import Optional
 from fastapi import HTTPException, status
 from passlib.context import CryptContext
 
@@ -42,5 +43,8 @@ class FilmeService:
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                 detail="Erro ao criar filme."
             )
+
+    def get_movie_by_id(self, db: Session, movie_id: int) -> Optional[Filme]:
+        return db.query(Filme).filter(Filme.id == movie_id).first()
         
 filme_service = FilmeService()
