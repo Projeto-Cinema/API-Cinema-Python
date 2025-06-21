@@ -1,3 +1,4 @@
+from datetime import datetime
 from typing import Optional
 from pydantic import BaseModel, Field
 
@@ -26,7 +27,7 @@ class SalaUpdate(BaseModel):
 class SalaResponse(SalaBase):
     id: int
     cinema_id: int
-    created_at: Optional[str] = None
+    created_at: datetime
 
     class Config:
         form_attributes = True
