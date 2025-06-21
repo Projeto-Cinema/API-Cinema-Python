@@ -251,3 +251,9 @@ def filme_data(create_generos):
         "em_cartaz": True,
         "generos_id": create_generos,
     }
+
+@pytest.fixture(scope="function")
+def create_movie(client, filme_data):
+    response = client.post("/api/v1/movies", json=filme_data)
+    assert response.status_code == status.HTTP_201_CREATED
+    return response.json()
