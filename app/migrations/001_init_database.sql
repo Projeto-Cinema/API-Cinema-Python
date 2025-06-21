@@ -108,7 +108,6 @@ CREATE TABLE IF NOT EXISTS public.filme (
     duracao_min INTEGER NOT NULL,
     diretor VARCHAR(100) NOT NULL,
     elenco TEXT NOT NULL,
-    generos TEXT NOT NULL,
     classificacao VARCHAR(10) NOT NULL,
     ano_lancamento INTEGER NOT NULL,
     em_cartaz BOOLEAN NOT NULL DEFAULT TRUE,
@@ -125,6 +124,30 @@ CREATE TABLE IF NOT EXISTS public.filme (
             ano_lancamento > 1800 AND 
             ano_lacamento <= EXTRACT(YEAR FROM CURRENT_DATE) + 5
         )
+);
+
+-- TABELA GENERO
+
+CREATE TABLE IF NOT EXISTS public.genero (
+    id SERIAL,
+    nome VARCHAR(50) NOT NULL UNIQUE,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT genero_pk PRIMARY KEY (id),
+);
+
+-- TABELA FILME_GENERO
+
+CREATE TABLE IF NOT EXISTS public.filme_genero (
+    filme_id INTEGER NOT NULL,
+    genero_id INTEGER NOT NULL,
+
+    CONSTRAINT filme_genero_pk PRIMARY KEY (filme_id, genero_id),
+    CONSTRAINT filme_genero_filme_fk FOREIGN KEY (filme_id)
+        REFERENCES public.filme (id) ON DELETE CASCADE,
+    CONSTRAINT filme_genero_genero_fk FOREIGN KEY (genero_id)
+        REFERENCES public.genero (id) ON DELETE CASCADE,
 );
 
 -- TABELA SESSAO
