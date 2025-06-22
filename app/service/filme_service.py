@@ -1,11 +1,11 @@
-from typing import Optional
+from typing import List, Optional
 from fastapi import HTTPException, status
 from passlib.context import CryptContext
 
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, joinedload
 from sqlalchemy.exc import IntegrityError
 
-from app.models.filme import Filme
+from app.models import Filme
 from app.models.genero import Genero
 from app.models.schemas.filme_schema import FilmeCreate
 
@@ -49,5 +49,31 @@ class FilmeService:
     
     def get_movie_by_title(self, db: Session, title: str) -> Optional[Filme]:
         return db.query(Filme).filter(Filme.titulo == title).first()
+    
+    def get_all_movies(
+        self,
+        db: Session,
+        skip: int = 0,
+        limit: int = 100,
+        em_cartaz: Optional[bool] = None,
+        diretor: Optional[str] = None,
+        classificacao: Optional[str] = None,
+        ano_lancamento: Optional[int] = None
+    ) -> List[Filme]:
+        query = db.query(Filme).options(joinedload(Filme.generos))
+
+        if em_cartaz is not None:
+            query = query.filter(Filme.em_cartaz == em_cartaz)
+        
+        if diretor is not None:
+            query = query.filter(Filme.diretor.ilike(f"%{diretor}%"))
+        
+        if classificacao is not None:
+            query = query.filter(Filme.classificacao.ilike(f"%{classificacao}%"))
+        
+        if ano_lancamento is not None:
+            query = query.filter(Filme.ano_lancamento == ano_lancamento)
+
+        return query.offset(skip).limit(limit).all()
         
 filme_service = FilmeService()

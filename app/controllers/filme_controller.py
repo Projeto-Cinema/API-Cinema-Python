@@ -1,3 +1,4 @@
+from typing import Optional
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 
 from sqlalchemy.orm import Session
@@ -24,6 +25,32 @@ async def create_movie(
     db: Session = Depends(get_db)
 ):
     return filme_service.create_movie(db, movie_data)
+
+@router.get(
+    "/all",
+    response_model=list[FilmeResponse],
+    status_code=status.HTTP_200_OK,
+    summary="Obtém todos os filmes",
+    description="Obtém uma lista de todos os filmes, com opções de paginação e filtros por status, diretor, classificação e ano de lançamento.",
+)
+async def get_all_movies(
+    db: Session = Depends(get_db),
+    skip: int = Query(0, ge=0, description="Número de registros a serem pulados para paginação"),
+    limit: int = Query(100, ge=1, le=100, description="Número máximo de registros a serem retornados"),
+    em_cartaz: Optional[bool] = Query(None, description="Filtrar filmes em cartaz (True) ou não (False), se fornecido"),
+    diretor: Optional[str] = Query(None, description="Filtrar filmes por nome do diretor"),
+    classificacao: Optional[str] = Query(None, description="Filtrar filmes por classificação"),
+    ano_lancamento: Optional[int] = Query(None, description="Filtrar filmes por ano de lançamento")
+):
+    return filme_service.get_all_movies(
+        db,
+        skip=skip,
+        limit=limit,
+        em_cartaz=em_cartaz,
+        diretor=diretor,
+        classificacao=classificacao,
+        ano_lancamento=ano_lancamento
+    )
 
 @router.get(
     "/{movie_id}",
