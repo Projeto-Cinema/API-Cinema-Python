@@ -77,3 +77,16 @@ class TestFilmeControllerUpdate:
         assert response_data["titulo"] == updated_data["titulo"]
         assert response_data["duracao_min"] == updated_data["duracao_min"]
         assert response_data["classificacao"] == updated_data["classificacao"]
+
+class TestFilmeControllerDelete:
+
+    def test_delete_permanent_movie_integration_success(self, client, create_movie):
+        movie_id = create_movie["id"]
+
+        response = client.delete(f"/api/v1/movies/delete/{movie_id}")
+
+        assert response.status_code == status.HTTP_204_NO_CONTENT
+
+        # Verifica se o filme foi realmente removido
+        response = client.get(f"/api/v1/movies/{movie_id}")
+        assert response.status_code == status.HTTP_404_NOT_FOUND
