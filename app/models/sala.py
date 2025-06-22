@@ -15,3 +15,4 @@ class Sala(BaseModel):
     # Relacionamentos
     cinema = relationship("Cinema", back_populates="salas")
     sessoes = relationship("Sessao", back_populates="sala", cascade="all, delete-orphan")
+    assentos = relationship("AssentoSala", back_populates="sala")
