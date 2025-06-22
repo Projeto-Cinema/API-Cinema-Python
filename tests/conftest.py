@@ -253,7 +253,45 @@ def filme_data(create_generos):
     }
 
 @pytest.fixture(scope="function")
+def filmes_data(create_generos):
+    return [
+        {
+            "titulo": "Filme exemplo",
+            "titulo_original": "Original Example",
+            "sinopse": "Sinopse do filme exemplo",
+            "duracao_min": 120,
+            "diretor": "Diretor Exemplo",
+            "elenco": "Ator 1, Ator 2",
+            "classificacao": "12 anos",
+            "ano_lancamento": 2023,
+            "em_cartaz": True,
+            "generos_id": create_generos,
+        },
+        {
+            "titulo": "Filme exemplo 2",
+            "titulo_original": "Original Example 2",
+            "sinopse": "Sinopse do filme exemplo 2",
+            "duracao_min": 90,
+            "diretor": "Diretor Exemplo 2",
+            "elenco": "Ator 3, Ator 4",
+            "classificacao": "14 anos",
+            "ano_lancamento": 2022,
+            "em_cartaz": False,
+            "generos_id": create_generos,
+        }
+    ]
+
+@pytest.fixture(scope="function")
 def create_movie(client, filme_data):
     response = client.post("/api/v1/movies", json=filme_data)
     assert response.status_code == status.HTTP_201_CREATED
     return response.json()
+
+@pytest.fixture(scope="function")
+def create_movies(client, filmes_data):
+    created_movies = []
+    for movie in filmes_data:
+        response = client.post("/api/v1/movies", json=movie)
+        assert response.status_code == status.HTTP_201_CREATED
+        created_movies.append(response.json())
+    return created_movies

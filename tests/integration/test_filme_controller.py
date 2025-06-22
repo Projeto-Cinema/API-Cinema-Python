@@ -1,3 +1,4 @@
+from typing import Dict, List
 from fastapi import status
 
 class TestFilmeControllerCreate:
@@ -39,3 +40,15 @@ class TestFilmeControllerGet:
         assert response_data["titulo"] == movie_title
         assert response_data["id"] == create_movie["id"]
         assert response_data["duracao_min"] == create_movie["duracao_min"]
+
+    def test_get_all_movies_integration_success(self, client, filmes_data: List[Dict], create_movies):
+        response = client.get("/api/v1/movies/all")
+        
+        print("=== DEBUG RESPONSE ===")
+        print("Status Code:", response.status_code)
+        print("Response Text:", response.text)
+        print("Response Headers:", dict(response.headers))
+
+        assert response.status_code == status.HTTP_200_OK
+
+        assert len(response.json()) == len(filmes_data)
