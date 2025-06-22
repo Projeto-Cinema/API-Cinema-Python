@@ -52,3 +52,28 @@ class TestFilmeControllerGet:
         assert response.status_code == status.HTTP_200_OK
 
         assert len(response.json()) == len(filmes_data)
+
+class TestFilmeControllerUpdate:
+    
+    def test_update_movie_integration_success(self, client, create_movie):
+        movie_id = create_movie["id"]
+        updated_data = {
+            "titulo": "Filme Atualizado",
+            "titulo_original": "Original Updated",
+            "sinopse": "Sinopse do filme atualizado",
+            "duracao_min": 130,
+            "diretor": "Diretor Atualizado",
+            "elenco": "Ator 1, Ator 2, Ator 3",
+            "classificacao": "16 anos",
+            "ano_lancamento": 2024,
+            "em_cartaz": False
+        }
+
+        response = client.put(f"/api/v1/movies/{movie_id}", json=updated_data)
+
+        assert response.status_code == status.HTTP_200_OK
+
+        response_data = response.json()
+        assert response_data["titulo"] == updated_data["titulo"]
+        assert response_data["duracao_min"] == updated_data["duracao_min"]
+        assert response_data["classificacao"] == updated_data["classificacao"]
