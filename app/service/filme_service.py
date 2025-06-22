@@ -109,4 +109,23 @@ class FilmeService:
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                 detail="Erro ao atualizar filme."
             )
+        
+    def delete_permanent_movie(
+        self,
+        db: Session,
+        movie_id: int
+    ) -> bool:
+        db_movie = self.get_movie_by_id(db, movie_id)
+
+        if not db_movie:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Filme não encontrado."
+            )
+        
+        db.delete(db_movie)
+        db.commit()
+
+        return True
+
 filme_service = FilmeService()

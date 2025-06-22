@@ -115,3 +115,21 @@ async def update_movie(
         )
     
     return db_movie
+
+@router.delete(
+    "/delete/{movie_id}",
+    status_code=status.HTTP_204_NO_CONTENT,
+    summary="Delete permanente de filme",
+    description="Deleta permanentemente um filme pelo ID fornecido. Retorna 204 No Content se a operação for bem-sucedida.",
+)
+async def delete_permanent_movie(
+    movie_id: int,
+    db: Session = Depends(get_db)
+):
+    success = filme_service.delete_permanent_movie(db, movie_id)
+
+    if not success:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Filme não encontrado."
+)
