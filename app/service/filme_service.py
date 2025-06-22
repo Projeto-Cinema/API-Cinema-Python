@@ -7,7 +7,7 @@ from sqlalchemy.exc import IntegrityError
 
 from app.models import Filme
 from app.models.genero import Genero
-from app.models.schemas.filme_schema import FilmeCreate
+from app.models.schemas.filme_schema import FilmeCreate, FilmeUpdate
 
 class FilmeService:
     def __init__(self):
@@ -75,5 +75,38 @@ class FilmeService:
             query = query.filter(Filme.ano_lancamento == ano_lancamento)
 
         return query.offset(skip).limit(limit).all()
+    
+    def update_movie(
+        self,
+        db: Session,
+        movie_id: int,
+        movie_data: FilmeUpdate
+    ) -> Optional[Filme]:
+        db_movie = self.get_movie_by_id(db, movie_id)
+    
+        if not db_movie:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Filme não encontrado."
+            )
         
+        try:
+            movie_dict = movie_data.model_dump(exclude_unset=True, exclude={'generos_id'})
+
+            for key, value in movie_dict.items():
+                setattr(db_movie, key, value)
+            
+            db.add(db_movie)
+            db.commit()
+            db.refresh(db_movie)
+
+            return db_movie
+        
+        except IntegrityError as e:
+            db.rollback()
+
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail="Erro ao atualizar filme."
+            )
 filme_service = FilmeService()

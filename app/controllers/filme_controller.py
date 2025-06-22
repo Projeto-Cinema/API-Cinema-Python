@@ -4,7 +4,7 @@ from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy.orm import Session
 
 from app.database import get_db
-from app.models.schemas.filme_schema import FilmeCreate, FilmeResponse
+from app.models.schemas.filme_schema import FilmeCreate, FilmeResponse, FilmeUpdate
 from app.service.filme_service import filme_service
 
 
@@ -85,6 +85,28 @@ async def get_movie_by_title(
     db: Session = Depends(get_db)
 ):
     db_movie = filme_service.get_movie_by_title(db, title)
+
+    if not db_movie:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Filme não encontrado."
+        )
+    
+    return db_movie
+
+@router.put(
+    "/{movie_id}",
+    response_model=FilmeResponse,
+    status_code=status.HTTP_200_OK,
+    summary="Atualiza um filme",
+    description="Atualiza os dados de um filme existente pelo ID fornecido. Retorna os detalhes do filme atualizado.",
+)
+async def update_movie(
+    movie_id: int,
+    movie_data: FilmeUpdate,
+    db: Session = Depends(get_db)
+):
+    db_movie = filme_service.update_movie(db, movie_id, movie_data)
 
     if not db_movie:
         raise HTTPException(
