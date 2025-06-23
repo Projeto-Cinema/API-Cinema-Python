@@ -9,7 +9,7 @@ from sqlalchemy.orm import sessionmaker
 from sqlalchemy.pool import StaticPool
 
 from app.models.genero import Genero
-from app.models.schemas.enum.enum_util import StatusSalaEnum
+from app.models.schemas.enum.enum_util import StatusAssentoEnum, StatusSalaEnum
 from main import app
 from app.database import Base, get_db
 
@@ -295,3 +295,19 @@ def create_movies(client, filmes_data):
         assert response.status_code == status.HTTP_201_CREATED
         created_movies.append(response.json())
     return created_movies
+
+@pytest.fixture(scope="function")
+def session_data(create_movie, create_sala):
+    return {
+        "data": "2023-10-01",
+        "horario_ini": "2023-10-01T14:00:00",
+        "horario_fim": "2023-10-01T16:00:00",
+        "idioma": "Português",
+        "legendado": True,
+        "formato": "2D",
+        "preco_base": 20.0,
+        "status": StatusAssentoEnum.ATIVA,
+        "filme_id": create_movie["id"],
+        "sala_id": create_sala["id"],
+        "assento_id": 0,
+    }
