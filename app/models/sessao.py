@@ -20,3 +20,6 @@ class Sessao(BaseModel):
     sala = relationship("Sala", back_populates="sessoes")
     assentos = relationship("Assento", back_populates="sessao", cascade="all, delete-orphan")
     reservas = relationship("Reserva", back_populates="sessao", cascade="all, delete-orphan")
+
+    def __repr__(self):
+        return f"<Sessao(id={self.id}, filme_id={self.filme_id}, sala_id={self.sala_id}, data='{self.data}')>"
