@@ -148,3 +148,23 @@ async def process_payment(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail=str(e)
         )
+    
+@router.get(
+    "{payment_id}/verify",
+    response_model=PagamentoResponse,
+    status_code=status.HTTP_200_OK,
+    summary="Verify Payment Status",
+    description="Verify the status of a payment by its ID and return the payment details."
+)
+async def verify_payment_status(
+    payment_id: int,
+    db: Session = Depends(get_db)
+):
+    try:
+        status_payment = payment_service.verify_payment_status(payment_id, db)
+        return {"payment_id": payment_id, "status": status_payment}
+    except NotFoundError as e:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=str(e)
+        )

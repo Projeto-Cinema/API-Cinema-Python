@@ -122,5 +122,13 @@ class PagamentoService:
         db.commit()
         db.refresh(payment)
         return payment
+    
+    def verify_payment_status(
+        self,
+        payment_id: int,
+        db: Session
+    ) -> str:
+        payment = self.get_payment_by_id(payment_id, db)
+        return payment.status
         
 payment_service = PagamentoService()
