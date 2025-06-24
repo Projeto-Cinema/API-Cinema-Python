@@ -68,3 +68,22 @@ def get_reservation_by_code(
             detail="Reserva não encontrada."
         )
     return reserva
+
+@router.get(
+    "/usuario/{usuario_id}",
+    response_model=list[ReservaResponse],
+    status_code=status.HTTP_200_OK,
+    summary="Lista reservas por usuário",
+    description="Retorna todas as reservas feitas por um usuário específico com base no ID do usuário.",
+)
+def list_reservations_by_user(
+    usuario_id: int,
+    db: Session = Depends(get_db)
+):
+    reservas = reserva_service.list_reservations_by_user(db, usuario_id)
+    if not reservas:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Nenhuma reserva encontrada para o usuário."
+        )
+    return reservas

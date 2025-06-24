@@ -95,4 +95,19 @@ class ReservaService:
     def get_reservation_by_code(self, db: Session, codigo: str) -> Optional[Reserva]:
         return db.query(Reserva).filter(Reserva.codigo == codigo).first()
     
+    def list_reservation_by_user(
+        self, 
+        db: Session, 
+        user_id: int, 
+        skip: int = 0, 
+        limit: int = 100
+    ) -> List[Reserva]:
+        return (
+            db.query(Reserva)
+                .filter(Reserva.usuario_id == user_id)
+                .offset(skip)
+                .limit(limit)
+                .all()
+        )
+    
 reserva_service = ReservaService()
