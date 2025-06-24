@@ -1,3 +1,4 @@
+from datetime import datetime
 from typing import List, Optional
 from passlib.context import CryptContext
 
@@ -97,5 +98,29 @@ class PagamentoService:
         except IntegrityError as e:
             db.rollback()
             raise ValidationError("Erro de integridade ao atualizar pagamento")
+        
+    def process_payment(
+        self,
+        payment_id: int,
+        db: Session
+    ) -> Pagamento:
+        payment = self.get_payment_by_id(payment_id, db)
+
+        if payment.status != "pendente":
+            raise ValidationError(f"Pagamento não pode ser processado. Status atual: {payment.status}")
+        
+        import random
+        success = random.choice([True, True, True, False])
+
+        if success:
+            payment.status = "aprovado"
+            payment.dt_pagamento = datetime.now()
+            payment.reserva.status = "confirmada"
+        else:
+            payment.status = "recusado"
+
+        db.commit()
+        db.refresh(payment)
+        return payment
         
 payment_service = PagamentoService()

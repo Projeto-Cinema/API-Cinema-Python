@@ -98,6 +98,13 @@ async def get_all_payments(
 
     return payments
 
+@router.put(
+    "/{payment_id}",
+    response_model=PagamentoResponse,
+    status_code=status.HTTP_200_OK,
+    summary="Update Payment",
+    description="Update an existing payment by its ID."
+)
 async def update_payment(
     payment_id: int,
     payment_data: PagamentoUpdate,
@@ -105,6 +112,31 @@ async def update_payment(
 ):
     try:
         payment = payment_service.update_payment(payment_id, payment_data, db)
+        return payment
+    except NotFoundError as e:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=str(e)
+        )
+    except ValidationError as e:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=str(e)
+        )
+    
+@router.post(
+    "/{payment_id}/process",
+    response_model=PagamentoResponse,
+    status_code=status.HTTP_200_OK,
+    summary="Process Payment",
+    description="Process a payment by its ID, updating its status and processing details."
+)
+async def process_payment(
+    payment_id: int,
+    db: Session = Depends(get_db)
+):
+    try:
+        payment = payment_service.process_payment(payment_id, db)
         return payment
     except NotFoundError as e:
         raise HTTPException(
