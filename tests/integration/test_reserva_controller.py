@@ -57,3 +57,18 @@ class TestReservaControllerGet:
         assert isinstance(response_data, list)
         assert len(response_data) >= 1
         assert response_data[0]["usuario_id"] == usuario_id
+
+class testReservaControllerUpdate:
+
+    def test_update_reserva_integration_success(self, client, create_reserva, reserva_update_data):
+        reserva_id = create_reserva["id"]
+
+        response = client.put(f"/api/v1/reservas/{reserva_id}", json=reserva_update_data)
+
+        assert response.status_code == status.HTTP_200_OK
+
+        response_data = response.json()
+        assert response_data["id"] == reserva_id
+        assert response_data["metodo_pagamento"] == reserva_update_data["metodo_pagamento"]
+        if "valor_total" in reserva_update_data:
+            assert response_data["valor_total"] == reserva_update_data["valor_total"]
