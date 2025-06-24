@@ -1,6 +1,6 @@
 import secrets
 import string
-from typing import List
+from typing import List, Optional
 from fastapi import HTTPException, status
 from passlib.context import CryptContext
 
@@ -88,5 +88,8 @@ class ReservaService:
         db.refresh(reserve)
 
         return reserve
+    
+    def get_reservation_by_id(self, db: Session, reserva_id: int) -> Optional[Reserva]:
+        return db.query(Reserva).filter(Reserva.id == reserva_id).first()
     
 reserva_service = ReservaService()

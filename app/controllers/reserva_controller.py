@@ -30,3 +30,22 @@ def create_reserve(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=str(e)
         )
+
+@router.get(
+    "/{reserva_id}",
+    response_model=ReservaResponse,
+    status_code=status.HTTP_200_OK,
+    summary="Busca uma reserva pelo ID",
+    description="Retorna os detalhes de uma reserva específica com base no ID fornecido.",
+)
+def get_reservation_by_id(
+    reserva_id: int,
+    db: Session = Depends(get_db)
+):
+    reserva = reserva_service.get_reservation_by_id(db, reserva_id)
+    if not reserva:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Reserva não encontrada."
+        )
+    return reserva
