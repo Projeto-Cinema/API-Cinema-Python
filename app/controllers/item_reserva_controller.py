@@ -10,7 +10,7 @@ from app.service.item_reserva_service import item_reserva_service
 
 router = APIRouter(
     prefix="/item_reserva",
-    tags=["item_reserva"],
+    tags=["Reservation Items"],
 )
 
 @router.get(
