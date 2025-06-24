@@ -40,4 +40,14 @@ class PagamentoService:
             db.rollback()
             raise ValidationError("Erro de integridade ao criar pagamento")
         
+    def get_payment_by_id(
+        self,
+        payment_id: int,
+        db: Session
+    ) -> Pagamento:
+        payment = db.query(Pagamento).filter(Pagamento.id == payment_id).first()
+        if not payment:
+            raise NotFoundError(f"Pagamento com ID {payment_id} não encontrado.")
+        return payment
+        
 payment_service = PagamentoService()
