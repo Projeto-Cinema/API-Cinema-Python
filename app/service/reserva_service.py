@@ -180,10 +180,30 @@ class ReservaService:
         
         reserve.status = StatusReservaEnum.CONFIRMADA.value
         reserve.metodo_pagamento = metodo
-        
+
         db.commit()
         db.refresh(reserve)
 
         return reserve
+    
+    def delete_reservation(
+        self,
+        reservation_id: int,
+        db: Session
+    ) -> True:
+        reserve = self.get_reservation_by_id(db, reservation_id)
+        if not reserve:
+            return None
+        
+        if reserve.status == StatusReservaEnum.CONFIRMADA.value:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Nãoe é possível excluir uma reserva confirmada."
+            )
+
+        db.delete(reserve)
+        db.commit()
+
+        return True
     
 reserva_service = ReservaService()

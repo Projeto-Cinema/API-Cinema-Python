@@ -136,7 +136,7 @@ def cancel_reservation(
     except HTTPException as e:
         raise e
 
-@router.pathc(
+@router.patch(
     "/{reserve_id}/confirm",
     response_model=ReservaResponse,
     status_code=status.HTTP_200_OK,
@@ -159,3 +159,30 @@ def confirm_reservation(
     
     except HTTPException as e:
         raise e
+
+@router.delete(
+    "/{reserve_id}",
+    status_code=status.HTTP_204_NO_CONTENT,
+    summary="Exclui uma reserva",
+    description="Exclui uma reserva existente com base no ID fornecido.",
+)    
+def delete_reservation(
+    reserve_id: int,
+    db: Session = Depends(get_db)
+):
+    try:
+        result = reserva_service.delete_reservation(db, reserve_id)
+        if not result:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Reserva não encontrada."
+            )
+        return {"detail": "Reserva excluída com sucesso."}
+    
+    except HTTPException as e:
+        raise e
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=str(e)
+)
