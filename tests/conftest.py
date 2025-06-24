@@ -1,3 +1,6 @@
+import app.models
+
+import datetime
 from re import M
 from fastapi.testclient import TestClient
 from fastapi import status
@@ -8,8 +11,8 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.pool import StaticPool
 
-from app.models.genero import Genero
-from app.models.schemas.enum.enum_util import StatusAssentoEnum, StatusSalaEnum
+from app.models.schemas.enum.enum_util import StatusAssentoEnum, StatusReservaEnum, StatusSalaEnum, TipoItemEnum
+from app.models.schemas.usuario_schema import UsuarioCreate
 from main import app
 from app.database import Base, get_db
 
@@ -38,6 +41,10 @@ def test_app():
 
 @pytest.fixture(scope="function")
 def db_setup():
+    print("\n" + "="*60)
+    print("TABELAS CONHECIDAS PELO METADATA ANTES DO CREATE_ALL:")
+    print(Base.metadata.tables.keys())
+    print("="*60)
     Base.metadata.create_all(bind=engine)
     yield
     Base.metadata.drop_all(bind=engine)
@@ -55,6 +62,21 @@ def db_session():
         yield db
     finally:
         db.close()
+
+@pytest.fixture(scope="function")
+def usuario_data():
+    return {
+        "nome": "Wesley",
+        "email": "wesley@gmail.com",
+        "senha": "senha123",
+        "telefone": "1234567890"
+    }
+
+@pytest.fixture(scope="function")
+def create_user(client, usuario_data):
+    response = client.post("api/v1/Users", json=usuario_data)
+    assert response.status_code == status.HTTP_201_CREATED
+    return response.json()
 
 @pytest.fixture(scope="session")
 def endereco_payload():
@@ -310,4 +332,78 @@ def session_data(create_movie, create_sala):
         "filme_id": create_movie["id"],
         "sala_id": create_sala["id"],
         "assento_id": 0,
+    }
+
+@pytest.fixture(scope="function")
+def reserva_data(create_user):
+    return {
+        "usuario_id": create_user["id"],
+        "sessao_id": 1,
+        "itens": [],
+        "codigo": "TEST1234",
+        "data_reserva": datetime.datetime.now().isoformat(),
+        "status": StatusReservaEnum.PENDENTE.value,
+        "valor_total": 50.00,
+        "metodo_pagamento": None,
+        "assentos": '["A1", "A2"]'
+    }
+
+@pytest.fixture
+def item_reserva_data():
+    """Dados para criar um item de reserva"""
+    return {
+        "item_id": 1,
+        "tipo": TipoItemEnum.ASSENTO.value,
+        "quantidade": 1,
+        "preco_unitario": 25.00,
+        "preco_total": 25.00,
+        "desconto": 0.00
+    }
+
+@pytest.fixture
+def reserva_data_with_itens():
+    """Dados para criar uma reserva com itens"""
+    return {
+        "usuario_id": 1,
+        "sessao_id": 1,
+        "codigo": "TEST5678",
+        "data_reserva": datetime.now().isoformat(),
+        "status": StatusReservaEnum.PENDENTE.value,
+        "valor_total": 75.00,
+        "metodo_pagamento": None,
+        "assentos": '["A1", "A2"]',
+        "itens": [
+            {
+                "item_id": 1,
+                "tipo": TipoItemEnum.ASSENTO.value,
+                "quantidade": 1,
+                "preco_unitario": 25.00,
+                "preco_total": 25.00,
+                "desconto": 0.00
+            },
+            {
+                "item_id": 2,
+                "tipo": TipoItemEnum.ASSENTO.value,
+                "quantidade": 1,
+                "preco_unitario": 25.00,
+                "preco_total": 25.00,
+                "desconto": 0.00
+            },
+            {
+                "item_id": 3,
+                "tipo": TipoItemEnum.PRODUTO.value,
+                "quantidade": 2,
+                "preco_unitario": 12.50,
+                "preco_total": 25.00,
+                "desconto": 0.00
+            }
+        ]
+    }
+
+@pytest.fixture
+def reserva_update_data():
+    """Dados para atualizar uma reserva"""
+    return {
+        "metodo_pagamento": "cartao_credito",
+        "valor_total": 60.00
     }
