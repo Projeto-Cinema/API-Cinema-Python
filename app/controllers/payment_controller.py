@@ -1,3 +1,4 @@
+from ast import Not
 from tkinter import N
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 
@@ -182,6 +183,30 @@ async def generate_voucher(
     try:
         voucher = payment_service.generate_voucher(payment_id, db)
         return voucher
+    except NotFoundError as e:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=str(e)
+        )
+    except ValidationError as e:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=str(e)
+        )
+    
+@router.delete(
+    "/{payment_id}",
+    status_code=status.HTTP_204_NO_CONTENT,
+    summary="Delete Payment",
+    description="Delete a payment by its ID."
+)
+async def delete_payment(
+    payment_id: int,
+    db: Session = Depends(get_db)
+):
+    try:
+        payment_service.delete_payment(payment_id, db)
+
     except NotFoundError as e:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,

@@ -151,5 +151,20 @@ class PagamentoService:
             "reserve_code": payment.reserva.codigo,
             "external_reference": payment.referencia_externa
         }
+    
+    def delete_payment(
+        self,
+        payment_id: int,
+        db: Session
+    ) -> bool:
+        payment = self.get_payment_by_id(payment_id, db)
+
+        if payment.status != "pendente":
+            raise ValidationError(f"Pagamento não pode ser excluído. Status atual: {payment.status}")
+        
+        db.delete(payment)
+        db.commit()
+
+        return True
         
 payment_service = PagamentoService()
