@@ -7,7 +7,7 @@ from sqlalchemy.exc import IntegrityError
 from app.exceptions.custom_exceptions import NotFoundError, ValidationError
 from app.models.pagamento import Pagamento
 from app.models.reserva import Reserva
-from app.models.schemas.pagamento_schema import PagamentoCreate
+from app.models.schemas.pagamento_schema import PagamentoCreate, PagamentoUpdate
 
 class PagamentoService:
     def __init__(self):
@@ -74,5 +74,28 @@ class PagamentoService:
         limit: int = 100
     ) -> List[Pagamento]:
         return db.query(Pagamento).filter(Pagamento.status == status).offset(skip).limit(limit).all() 
+    
+    def update_payment(
+        self,
+        payment_id: int,
+        payment_data: PagamentoUpdate,
+        db: Session
+    ) -> Pagamento:
+        payment = self.get_payment_by_id(payment_id, db)
+        if payment_data.valor is not None:
+            if abs(payment_data.valor - payment.reserva.valor_total) > 0.01:
+                raise ValidationError(f"Valor do pagamento {payment_data.valor} não corresponde ao valor da reserva {payment.reserva.valor_total}.")
+            
+        update_data = payment_data.model_dump(exclude_unset=True)
+        for field, value in update_data.items():
+            setattr(payment, field, value)
+
+        try:
+            db.commit()
+            db.refresh(payment)
+            return payment
+        except IntegrityError as e:
+            db.rollback()
+            raise ValidationError("Erro de integridade ao atualizar pagamento")
         
 payment_service = PagamentoService()

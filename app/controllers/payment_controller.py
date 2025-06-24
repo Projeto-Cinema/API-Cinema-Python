@@ -1,10 +1,11 @@
+from tkinter import N
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 
 from sqlalchemy.orm import Session
 
 from app.database import get_db
 from app.exceptions.custom_exceptions import NotFoundError, ValidationError
-from app.models.schemas.pagamento_schema import PagamentoCreate, PagamentoResponse
+from app.models.schemas.pagamento_schema import PagamentoCreate, PagamentoResponse, PagamentoUpdate
 from app.service.pagamento_service import payment_service
 
 
@@ -96,3 +97,22 @@ async def get_all_payments(
         payments = payment_service.get_all_payments(db, skip, limit)
 
     return payments
+
+async def update_payment(
+    payment_id: int,
+    payment_data: PagamentoUpdate,
+    db: Session = Depends(get_db)
+):
+    try:
+        payment = payment_service.update_payment(payment_id, payment_data, db)
+        return payment
+    except NotFoundError as e:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=str(e)
+        )
+    except ValidationError as e:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=str(e)
+        )
