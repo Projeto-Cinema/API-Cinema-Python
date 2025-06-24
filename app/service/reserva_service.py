@@ -91,5 +91,8 @@ class ReservaService:
     
     def get_reservation_by_id(self, db: Session, reserva_id: int) -> Optional[Reserva]:
         return db.query(Reserva).filter(Reserva.id == reserva_id).first()
+
+    def get_reservation_by_code(self, db: Session, codigo: str) -> Optional[Reserva]:
+        return db.query(Reserva).filter(Reserva.codigo == codigo).first()
     
 reserva_service = ReservaService()
