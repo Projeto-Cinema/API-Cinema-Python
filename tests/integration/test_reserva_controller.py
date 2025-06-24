@@ -45,3 +45,15 @@ class TestReservaControllerGet:
         response_data = response.json()
         assert response_data["codigo"] == codigo
         assert response_data["id"] == create_reserva["id"]
+
+    def test_get_reservas_by_usuario_integration_success(self, client, create_reserva):
+        usuario_id = create_reserva["usuario_id"]
+
+        response = client.get(f"/api/v1/reservas/usuario/{usuario_id}")
+
+        assert response.status_code == status.HTTP_200_OK
+
+        response_data = response.json()
+        assert isinstance(response_data, list)
+        assert len(response_data) >= 1
+        assert response_data[0]["usuario_id"] == usuario_id
