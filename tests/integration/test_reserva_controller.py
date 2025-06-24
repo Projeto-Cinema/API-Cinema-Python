@@ -72,3 +72,16 @@ class testReservaControllerUpdate:
         assert response_data["metodo_pagamento"] == reserva_update_data["metodo_pagamento"]
         if "valor_total" in reserva_update_data:
             assert response_data["valor_total"] == reserva_update_data["valor_total"]
+
+# class TestReservaControllerDelete:
+    
+#     def test_cancelar_reserva_integration_success(self, client, create_reserva_pendente):
+#         reserva_id = create_reserva_pendente["id"]
+
+#         response = client.patch(f"/reservas/{reserva_id}/cancelar")
+
+#         assert response.status_code == status.HTTP_200_OK
+
+#         response_data = response.json()
+#         assert response_data["id"] == reserva_id
+#         assert response_data["status"] == "cancelada"
