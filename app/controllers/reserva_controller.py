@@ -112,3 +112,26 @@ def update_reserve(
     
     except HTTPException as e:
         raise e
+    
+@router.patch(
+    "/{reserve_id}/status",
+    response_model=ReservaResponse,
+    status_code=status.HTTP_200_OK,
+    summary="Atualiza o status de uma reserva",
+    description="Atualiza o status de uma reserva existente com base no ID fornecido.",
+)
+def cancel_reservation(
+    reserve_id: int,
+    db: Session = Depends(get_db)
+):
+    try:
+        reserve = reserva_service.cancel_reservation(db, reserve_id)
+        if not reserve:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Reserva não encontrada."
+            )
+        return ReservaResponse.from_orm(reserve)
+    
+    except HTTPException as e:
+        raise e

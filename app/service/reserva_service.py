@@ -7,6 +7,7 @@ from passlib.context import CryptContext
 from sqlalchemy.orm import Session
 
 from app.models.reserva import ItemReserva, Reserva
+from app.models.schemas.enum.enum_util import StatusReservaEnum
 from app.models.schemas.item_reserva_schema import ItemReservaCreate
 from app.models.schemas.reserva_schema import ReservaCreate, ReservaUpdate
 from app.models.sessao import Sessao
@@ -129,6 +130,33 @@ class ReservaService:
         for field, value in update_data.items():
             setattr(reserve, field, value)
 
+        db.commit()
+        db.refresh(reserve)
+
+        return reserve
+    
+    def cancel_reservation(
+        self,
+        reservation_id: int,
+        db: Session
+    ) -> Optional[Reserva]:
+        reserve = self.get_reservation_by_id(db, reservation_id)
+        if not reserve:
+            return None
+        
+        if reserve.status == StatusReservaEnum.CANCELADA.value:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Reserva já está cancelada."
+            )
+        
+        if reserve.status == StatusReservaEnum.CONFIRMADA.value:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Reserva confirmada não pode ser cancelada."
+            )
+        
+        reserve.status = StatusReservaEnum.CANCELADA.value
         db.commit()
         db.refresh(reserve)
 
