@@ -161,5 +161,29 @@ class ReservaService:
         db.refresh(reserve)
 
         return reserve
+
+    def confirm_reservation(
+        self,
+        reservation_id: int,
+        metodo: str,
+        db: Session
+    ) -> Optional[Reserva]:
+        reserve = self.get_reservation_by_id(db, reservation_id)
+        if not reserve:
+            return None
+        
+        if reserve.status != StatusReservaEnum.PENDENTE.value:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Apenas reservas pendentes podem ser confirmadas."
+            )
+        
+        reserve.status = StatusReservaEnum.CONFIRMADA.value
+        reserve.metodo_pagamento = metodo
+        
+        db.commit()
+        db.refresh(reserve)
+
+        return reserve
     
 reserva_service = ReservaService()

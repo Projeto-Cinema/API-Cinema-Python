@@ -135,3 +135,27 @@ def cancel_reservation(
     
     except HTTPException as e:
         raise e
+
+@router.pathc(
+    "/{reserve_id}/confirm",
+    response_model=ReservaResponse,
+    status_code=status.HTTP_200_OK,
+    summary="Confirma uma reserva",
+    description="Confirma uma reserva existente com base no ID fornecido e o método de pagamento.",
+)
+def confirm_reservation(
+    reserve_id: int,
+    method: str,
+    db: Session = Depends(get_db)
+):
+    try:
+        reserve = reserva_service.confirm_reservation(db, reserve_id, method)
+        if not reserve:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Reserva não encontrada."
+            )
+        return ReservaResponse.from_orm(reserve)
+    
+    except HTTPException as e:
+        raise e
