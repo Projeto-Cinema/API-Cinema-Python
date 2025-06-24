@@ -168,3 +168,27 @@ async def verify_payment_status(
             status_code=status.HTTP_404_NOT_FOUND,
             detail=str(e)
         )
+    
+@router.get(
+    "/{payment_id}/voucher",
+    status_code=status.HTTP_200_OK,
+    summary="Generate Voucher",
+    description="Generate a voucher for a payment by its ID if the payment is approved."
+)
+async def generate_voucher(
+    payment_id: int,
+    db: Session = Depends(get_db)
+):
+    try:
+        voucher = payment_service.generate_voucher(payment_id, db)
+        return voucher
+    except NotFoundError as e:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=str(e)
+        )
+    except ValidationError as e:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=str(e)
+        )

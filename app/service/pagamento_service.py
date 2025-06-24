@@ -130,5 +130,26 @@ class PagamentoService:
     ) -> str:
         payment = self.get_payment_by_id(payment_id, db)
         return payment.status
+    
+    def generate_voucher(
+        self,
+        payment_id: int,
+        db: Session
+    ) -> dict:
+        payment = self.get_payment_by_id(payment_id, db)
+
+        if payment.status != "aprovado":
+            raise ValidationError(f"Pagamento não aprovado. Status atual: {payment.status}")
+        
+        return {
+            "payment_id": payment.id,
+            "reservation_id": payment.reserva_id,
+            "value": payment.valor,
+            "method": payment.metodo,
+            "dt_payment": payment.dt_pagamento,
+            "status": payment.status,
+            "reserve_code": payment.reserva.codigo,
+            "external_reference": payment.referencia_externa
+        }
         
 payment_service = PagamentoService()
