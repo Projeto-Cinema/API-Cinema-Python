@@ -4,6 +4,7 @@ from app.models.base import BaseModel
 
 
 class AssentoSala(BaseModel):
+    __tablename__ = "assento_sala"
     sala_id = Column(Integer, ForeignKey("sala.id"), nullable=False)
     codigo = Column(String(10), nullable=False)
     tipo = Column(String(20), nullable=False)

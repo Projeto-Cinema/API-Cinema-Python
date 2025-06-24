@@ -1,22 +1,11 @@
+import app.models
+
 from fastapi import FastAPI, Depends, HTTPException
 from sqlalchemy.orm import Session
 from sqlalchemy import text
 
 from app.config import settings
 from app.database import get_db, create_tables, initialize_database
-
-from app.models.cinema import Cinema
-from app.models.sala import Sala
-from app.models.filme import Filme, filme_genero
-from app.models.genero import Genero
-from app.models.Produto import Produto
-from app.models.pagamento import Pagamento
-from app.models.reserva import Reserva, ItemReserva
-from app.models.sessao import Sessao
-from app.models.assento import Assento
-from app.models.assento_sala import AssentoSala
-from app.models.usuario import Usuario
-from app.models.endereco import Endereco
 
 from app.controllers.usuario_controller import router as usuario_router
 from app.controllers.endereco_controller import router as endereco_router
@@ -26,6 +15,7 @@ from app.controllers.sala_controller import router as sala_router
 from app.controllers.filme_controller import router as filme_router
 from app.controllers.assento_controller import router as assento_router
 from app.controllers.sessao_controller import router as sessao_router
+from app.controllers.reserva_controller import router as reserva_router
 
 app = FastAPI(
     title=settings.PROJECT_NAME,
@@ -41,6 +31,7 @@ app.include_router(sala_router, prefix="/api/v1", tags=["Room"])
 app.include_router(filme_router, prefix="/api/v1", tags=["Movies"])
 app.include_router(assento_router, prefix="/api/v1", tags=["Seats"])
 app.include_router(sessao_router, prefix="/api/v1", tags=["Session"])
+app.include_router(reserva_router, prefix="/api/v1", tags=["Reservation"])
 
 @app.on_event("startup")
 async def startup_event():

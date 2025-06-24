@@ -14,7 +14,7 @@ CREATE TABLE IF NOT EXISTS public.assento_sala (
         REFERENCES public.sala (id) ON DELETE CASCADE,
 
     CONSTRAINT assento_sala_ativo_check CHECK (ativo IN ('ativo', 'inativo', 'manutencao')),
-    CONSTRAINT assento_sala_tipo_check CHECK (tipo IN ('normal', 'vip', 'casal', 'premium'),
+    CONSTRAINT assento_sala_tipo_check CHECK (tipo IN ('normal', 'vip', 'casal', 'premium')),
 
     CONSTRAINT assento_sala_codigo_uk UNIQUE (sala_id, codigo) 
 );
