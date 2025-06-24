@@ -23,7 +23,7 @@ class TestReservaControllerGet:
     def test_get_reserva_by_id_integration_success(self, client, create_reserva):
         reserva_id = create_reserva["id"]
 
-        response = client.get(f"/reservas/{reserva_id}")
+        response = client.get(f"/api/v1/reservas/{reserva_id}")
 
         assert response.status_code == status.HTTP_200_OK
 
@@ -34,3 +34,14 @@ class TestReservaControllerGet:
         assert response_data["codigo"] == create_reserva["codigo"]
         assert response_data["status"] == create_reserva["status"]
         assert response_data["valor_total"] == create_reserva["valor_total"]
+
+    def test_get_reserva_by_codigo_integration_success(self, client, create_reserva):
+        codigo = create_reserva["codigo"]
+
+        response = client.get(f"/api/v1/reservas/codigo/{codigo}")
+
+        assert response.status_code == status.HTTP_200_OK
+
+        response_data = response.json()
+        assert response_data["codigo"] == codigo
+        assert response_data["id"] == create_reserva["id"]
