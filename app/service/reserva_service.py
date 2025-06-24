@@ -8,7 +8,7 @@ from sqlalchemy.orm import Session
 
 from app.models.reserva import ItemReserva, Reserva
 from app.models.schemas.item_reserva_schema import ItemReservaCreate
-from app.models.schemas.reserva_schema import ReservaCreate
+from app.models.schemas.reserva_schema import ReservaCreate, ReservaUpdate
 from app.models.sessao import Sessao
 from app.models.usuario import Usuario
 
@@ -109,5 +109,29 @@ class ReservaService:
                 .limit(limit)
                 .all()
         )
+    
+    def update_reservation(
+        self,
+        reservation_id: int,
+        reserve_update: ReservaUpdate,
+        db: Session
+    ) -> Optional[Reserva]:
+        reserve = self.get_reservation_by_id(db, reservation_id)
+
+        if not reserve:
+            return None
+        
+        update_data = reserve_update.dict(exclude_unset=True)
+
+        if 'status' in update_data and update_data['status']:
+            update_data['status'] = update_data['status'].value
+
+        for field, value in update_data.items():
+            setattr(reserve, field, value)
+
+        db.commit()
+        db.refresh(reserve)
+
+        return reserve
     
 reserva_service = ReservaService()

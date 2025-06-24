@@ -3,7 +3,7 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
 from app.database import get_db
-from app.models.schemas.reserva_schema import ReservaCreate, ReservaResponse
+from app.models.schemas.reserva_schema import ReservaCreate, ReservaResponse, ReservaUpdate
 from app.service.reserva_service import reserva_service
 
 
@@ -87,3 +87,28 @@ def list_reservations_by_user(
             detail="Nenhuma reserva encontrada para o usuário."
         )
     return reservas
+
+@router.put(
+    "/{reserve_id}",
+    response_model=ReservaResponse,
+    status_code=status.HTTP_200_OK,
+    summary="Atualiza uma reserva",
+    description="Atualiza os detalhes de uma reserva existente com base no ID fornecido.",
+)
+def update_reserve(
+    reserve_id: int,
+    reserve_data: ReservaUpdate,
+    db: Session = Depends(get_db)
+):
+    try:
+        reserve = reserva_service.update_reservation(db, reserve_id, reserve_data)
+        if not reserve:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Reserva não encontrada."
+            )
+
+        return ReservaResponse.from_orm(reserve)
+    
+    except HTTPException as e:
+        raise e
