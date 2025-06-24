@@ -47,4 +47,25 @@ class ItemReservaService:
 
         return item
     
+    def remove_item_reserve(
+        self,
+        item_id: int,
+        db: Session
+    ) -> bool:
+        item = self.search_item_by_id(db, item_id)
+        if not item:
+            return False
+        
+        reserve = db.query(Reserva).filter(Reserva.id == item.reserva_id).first()
+        if reserve.status != StatusReservaEnum.PENDENTE.value:
+            raise ValueError("Não é possível remover itens pendentes")
+        
+        value_item = item.preco_total - item.desconto
+        reserve.valor_total -= value_item
+
+        db.delete(item)
+        db.commit()
+
+        return True
+    
 item_reserva_service = ItemReservaService()

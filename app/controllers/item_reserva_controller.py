@@ -45,3 +45,23 @@ def add_item_reserve(
     
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
+
+@router.delete(
+    "/itens/{item_id}",
+    status_code=status.HTTP_204_NO_CONTENT,
+    summary="Remover Item Reserva",
+    description="Remove um item reserva de uma reserva existente.",
+)
+def remove_item_reserve(
+    item_id: int,
+    db: Session = Depends(get_db)
+):
+    try:
+        success = item_reserva_service.remove_item_reserve(item_id, db)
+        if not success:
+            raise HTTPException(status_code=404, detail="Item reserva não encontrado")
+        
+        return {"detail": "Item reserva removido com sucesso"}
+    
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
