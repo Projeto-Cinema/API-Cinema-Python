@@ -16,6 +16,8 @@ from app.controllers.filme_controller import router as filme_router
 from app.controllers.assento_controller import router as assento_router
 from app.controllers.sessao_controller import router as sessao_router
 from app.controllers.reserva_controller import router as reserva_router
+from app.controllers.item_reserva_controller import router as item_reserva_router
+from app.controllers.payment_controller import router as pagamento_router
 
 app = FastAPI(
     title=settings.PROJECT_NAME,
@@ -32,6 +34,8 @@ app.include_router(filme_router, prefix="/api/v1", tags=["Movies"])
 app.include_router(assento_router, prefix="/api/v1", tags=["Seats"])
 app.include_router(sessao_router, prefix="/api/v1", tags=["Session"])
 app.include_router(reserva_router, prefix="/api/v1", tags=["Reservation"])
+app.include_router(item_reserva_router, prefix="/api/v1", tags=["Reservation Items"])
+app.include_router(pagamento_router, prefix="/api/v1", tags=["Payment"])
 
 @app.on_event("startup")
 async def startup_event():
