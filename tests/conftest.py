@@ -407,3 +407,10 @@ def reserva_update_data():
         "metodo_pagamento": "cartao_credito",
         "valor_total": 60.00
     }
+
+@pytest.fixture
+def create_reserva(client, reserva_data):
+    """Cria uma reserva no banco para testes"""
+    response = client.post("/api/v1/reservas", json=reserva_data)
+    assert response.status_code == 201
+    return response.json()
