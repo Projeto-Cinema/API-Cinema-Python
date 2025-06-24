@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import List, Optional
 from passlib.context import CryptContext
 
 from sqlalchemy.orm import Session
@@ -57,5 +57,22 @@ class PagamentoService:
         db: Session
     ) -> Optional[Pagamento]:
         return db.query(Pagamento).filter(Pagamento.reserva_id == reservation_id).first()
+    
+    def get_all_payments(
+        self,
+        db: Session,
+        skip: int = 0,
+        limit: int = 100,
+    ) -> List[Pagamento]:
+        return db.query(Pagamento).offset(skip).limit(limit).all()
+    
+    def get_payment_by_status(
+        self,
+        db: Session,
+        status: str,
+        skip: int = 0,
+        limit: int = 100
+    ) -> List[Pagamento]:
+        return db.query(Pagamento).filter(Pagamento.status == status).offset(skip).limit(limit).all() 
         
 payment_service = PagamentoService()

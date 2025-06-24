@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, Query, status
 
 from sqlalchemy.orm import Session
 
@@ -76,3 +76,23 @@ async def get_payment_by_reservation_id(
             detail=f"Payment for reservation ID {reservation_id} not found."
         )
     return payment
+
+@router.get(
+    "/",
+    response_model=list[PagamentoResponse],
+    status_code=status.HTTP_200_OK,
+    summary="Get All Payments",
+    description="Retrieve all payments with optional filtering by status."
+)
+async def get_all_payments(
+    skip: int = Query(0, ge=0, description="Number of payments to skip"),
+    limit: int = Query(100, ge=1, le=1000, description="Maximum number of payments to return"),
+    status: str = Query(None, description="Filter payments by status"),
+    db: Session = Depends(get_db)
+):
+    if status:
+        payments = payment_service.get_all_payments_by_status(db, status, skip, limit)
+    else:
+        payments = payment_service.get_all_payments(db, skip, limit)
+
+    return payments
