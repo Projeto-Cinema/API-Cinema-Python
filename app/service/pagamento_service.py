@@ -1,3 +1,4 @@
+from typing import Optional
 from passlib.context import CryptContext
 
 from sqlalchemy.orm import Session
@@ -49,5 +50,12 @@ class PagamentoService:
         if not payment:
             raise NotFoundError(f"Pagamento com ID {payment_id} não encontrado.")
         return payment
+    
+    def get_payment_by_reservation_id(
+        self,
+        reservation_id: int,
+        db: Session
+    ) -> Optional[Pagamento]:
+        return db.query(Pagamento).filter(Pagamento.reserva_id == reservation_id).first()
         
 payment_service = PagamentoService()

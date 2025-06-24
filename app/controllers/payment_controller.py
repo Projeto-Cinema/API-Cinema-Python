@@ -57,3 +57,22 @@ async def get_payment_by_id(
             status_code=status.HTTP_404_NOT_FOUND,
             detail=str(e)
         )
+
+@router.get(
+    "/reservation/{reservation_id}",
+    response_model=PagamentoResponse,
+    status_code=status.HTTP_200_OK,
+    summary="Get Payment by Reservation ID",
+    description="Retrieve a payment by its associated reservation ID."
+)    
+async def get_payment_by_reservation_id(
+    reservation_id: int,
+    db: Session = Depends(get_db)
+):
+    payment = payment_service.get_payment_by_reservation_id(reservation_id, db)
+    if not payment:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Payment for reservation ID {reservation_id} not found."
+        )
+    return payment
