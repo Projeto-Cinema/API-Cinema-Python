@@ -25,7 +25,7 @@ def search_item_reserve(
 ):
     itens = item_reserva_service.search_item_by_id(db, reserve_id)
 
-    return [ItemReservaResponse.from_orm(item) for item in itens]
+    return itens
 
 @router.post(
     "/{reserve_id}/itens",

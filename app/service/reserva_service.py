@@ -1,4 +1,4 @@
-import secrets
+import random
 import string
 from typing import List, Optional
 from fastapi import HTTPException, status
@@ -20,7 +20,7 @@ class ReservaService:
 
     def _generate_reserve_code(self, db: Session) -> str:
         while True:
-            code = ''.join(secrets.choices(string.ascii_uppercase + string.digits, k=8))
+            code = ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(8))
             if not db.query(Reserva).filter(Reserva.codigo == code).first():
                 return code
 

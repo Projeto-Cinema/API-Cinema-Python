@@ -7,7 +7,6 @@ from app.models.schemas.item_reserva_schema import ItemReservaCreate, ItemReserv
 
 
 class ReservaBase(BaseModel):
-    codigo: str = Field(max_length=20)
     data_reserva: datetime
     status: StatusReservaEnum = StatusReservaEnum.PENDENTE
     valor_total: float = Field(ge=0)

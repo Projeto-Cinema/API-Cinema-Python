@@ -12,7 +12,7 @@ class ItemReservaService:
         self.pwd_context = CryptContext(deprecated="auto")
 
     def search_item_by_id(self, db: Session, item_id: int) -> Optional[ItemReserva]:
-        return db.query(ItemReserva).filter(ItemReserva.id == item_id).first()
+        return db.query(ItemReserva).filter(ItemReserva.reserva_id == item_id).all()
     
     def add_item_reserve(
         self,
