@@ -1,0 +1,18 @@
+# Configuração do Black (Formatador de código)
+[tool.black]
+line-length = 88
+target-version = ['py39'] # Use a versão do Python que você está usando, ex: py39, py310, py312
+
+# Configuração do iSort (Organizador de imports)
+[tool.isort]
+profile = "black"
+line_length = 88
+multi_line_output = 3
+include_trailing_comma = true
+
+# Configuração do mypy (Verificador de tipos)
+[tool.mypy]
+python_version = "3.9" # Use a mesma versão do Python
+warn_return_any = true
+warn_unused_configs = true
+ignore_missing_imports = true # Muito útil para libs que não têm stubs de tipo
