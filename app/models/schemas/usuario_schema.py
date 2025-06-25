@@ -84,8 +84,8 @@ class UsuarioAuthenticate(BaseModel):
 
 class UsuarioResponse(UsuarioBase):
     id: int
-    dt_cadastro: datetime
-    ultimo_acesso: Optional[datetime] = None
+    created_at: datetime
+    updated_at: Optional[datetime] = None
 
     class Config:
         from_attributes = True
