@@ -4,6 +4,7 @@ from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy.orm import Session
 
 from app.database import get_db
+from app.dependencies.auth import get_current_active_user, get_current_admin_user
 from app.models.schemas.cinema_schema import CinemaCreate, CinemaResponse, CinemaUpdate
 from app.service.cinema_service import cinema_service
 
@@ -22,7 +23,8 @@ router = APIRouter(
 )
 async def create_cinema(
     cinema: CinemaCreate,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    current_user = Depends(get_current_admin_user)
 ):
     return cinema_service.create_cinema(db, cinema)
 
@@ -35,7 +37,8 @@ async def create_cinema(
 )
 async def get_cinema_by_id(
     cinema_id: int,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    current_user = Depends(get_current_admin_user)
 ):
     db_cinema = cinema_service.get_cinema_by_id(db, cinema_id)
 
@@ -56,7 +59,8 @@ async def get_cinema_by_id(
 )
 async def get_cinema_by_name(
     name: str,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    current_user = Depends(get_current_active_user)
 ):
     db_cinema = cinema_service.get_cinema_by_name(db, name)
 
@@ -79,7 +83,8 @@ async def get_cinemas(
     skip: int = Query(0, ge=0, description="Número de registros a serem pulados"),
     limit: int = Query(100, ge=1, le=1000, description="Número máximo de registros a serem retornados"),
     ativo: Optional[bool] = Query(None, description="Filtrar cinemas ativos ou inativos"),
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    current_user = Depends(get_current_admin_user)
 ):
     return cinema_service.get_cinemas(
         db,
@@ -98,7 +103,8 @@ async def get_cinemas(
 async def update_cinema(
     cinema_id: int,
     cinema_data: CinemaUpdate,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    current_user = Depends(get_current_admin_user)
 ):
     db_cinema = cinema_service.update_cinema(db, cinema_id, cinema_data)
 
@@ -118,7 +124,8 @@ async def update_cinema(
 )
 async def parcial_delete_cinema(
     cinema_id: int,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    current_user = Depends(get_current_admin_user)
 ):
     success = cinema_service.parcial_delete_cinema(db, cinema_id)
 
@@ -136,7 +143,8 @@ async def parcial_delete_cinema(
 )
 async def delete_cinema(
     cinema_id: int,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    current_user = Depends(get_current_admin_user)
 ):
     success = cinema_service.permanent_delete_cinema(db, cinema_id)
 
