@@ -6,6 +6,8 @@ from sqlalchemy.orm import Session
 from sqlalchemy.exc import IntegrityError
 
 from app.models import Sala
+from app.models.assento_sala import AssentoSala
+from app.models.cinema import Cinema
 from app.models.schemas.enum.enum_util import StatusSalaEnum
 from app.models.schemas.sala_schema import SalaCreate, SalaUpdate
 
@@ -14,22 +16,38 @@ class SalaService:
         self.pwd_context = CryptContext(deprecated="auto")
 
     def create_room(self, db: Session, room_data: SalaCreate) -> Sala:
+        cinema = db.query(Cinema).filter(Cinema.id == room_data.cinema_id).first()
+        if not cinema:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail=f"Cinema com id {room_data.cinema_id} não encontrado."
+            )
+        
+        seat_data = room_data.assentos
+        room_dict = room_data.model_dump(exclude={"assentos"})
+
+        db_room = Sala(**room_dict)
+
         try:
-            room_dict = room_data.model_dump()
-            
-            db_room = Sala(**room_dict)
             db.add(db_room)
+            db.flush()
+
+            for seat in seat_data:
+                db_seat = AssentoSala(
+                    **seat.dict(),
+                    sala_id=db_room.id
+                )
+                db.add(db_seat)
+
             db.commit()
             db.refresh(db_room)
 
             return db_room
-        
         except IntegrityError as e:
             db.rollback()
-
             raise HTTPException(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                detail="Erro ao criar sala."
+                detail="Erro ao criar sala. Verifique os dados informados."
             )
         
     def get_room_by_id(self, db: Session, room_id: int) -> Optional[Sala]:
