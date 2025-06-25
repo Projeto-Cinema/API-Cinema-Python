@@ -11,7 +11,3 @@ max-complexity = 10
 
 # Configurações para o plugin flake8-import-order
 import-order-style = google
-
-[flake8:local-plugins]
-extension =
-    I = flake8_import_order:flake8_import_order.ImportOrderChecker
