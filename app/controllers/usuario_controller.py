@@ -3,7 +3,7 @@ from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy.orm import Session
 
 from app.database import get_db
-from app.dependencies.auth import get_current_active_user
+from app.dependencies.auth import get_current_active_user, get_current_admin_user
 from app.models.schemas.usuario_schema import UsuarioCreate, UsuarioResponse, UsuarioUpdate
 from app.service.usuario_service import usuario_service
 
@@ -55,7 +55,11 @@ async def get_user_by_id(
     summary="Obtém usuário por email",
     description="Obtém os detalhes de um usuário específico pelo email fornecido. Retorna um erro 404 se o usuário não for encontrado.",
 )
-async def get_user_by_email(email: str, db: Session = Depends(get_db)):
+async def get_user_by_email(
+        email: str, 
+        db: Session = Depends(get_db),
+        current_user = Depends(get_current_admin_user)
+    ):
     db_usuario = usuario_service.get_usuario_by_email(db, email)
 
     if not db_usuario:
@@ -73,7 +77,11 @@ async def get_user_by_email(email: str, db: Session = Depends(get_db)):
     summary="Obtém usuário por CPF",
     description="Obtém os detalhes de um usuário específico pelo CPF fornecido. Retorna um erro 404 se o usuário não for encontrado.",
 )
-async def get_user_by_cpf(cpf: str, db: Session = Depends(get_db)):
+async def get_user_by_cpf(
+        cpf: str,
+        db: Session = Depends(get_db),
+        current_user = Depends(get_current_admin_user)
+    ):
     db_usuario = usuario_service.get_usuario_by_cpf(db, cpf)
 
     if not db_usuario:
@@ -96,7 +104,8 @@ async def get_users(
     limit: int = Query(100, ge=1, le=1000, description="Limite de registros por página"),
     ativo: Optional[bool] = Query(None, description="Filtrar por status ativo"),
     tipo: Optional[bool] = Query(None, description="Filtrar por tipo de usuário"),
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    current_user = Depends(get_current_admin_user)
 ):
     return usuario_service.get_usuarios(
         db,
@@ -116,7 +125,8 @@ async def get_users(
 async def update_user(
     usuario_id: int,
     usuario_data: UsuarioUpdate,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    current_user = Depends(get_current_active_user)
 ):
     db_usuario = usuario_service.update_usuarios(db, usuario_id, usuario_data)
 
@@ -136,7 +146,8 @@ async def update_user(
 )
 async def desactivate_user(
     usuario_id: int,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    current_user = Depends(get_current_active_user)
 ):
     success = usuario_service.delete_partial_user(db, usuario_id)
 
@@ -154,7 +165,8 @@ async def desactivate_user(
 )
 async def delete_user(
     usuario_id: int,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    current_user = Depends(get_current_admin_user)
 ):
     success = usuario_service.delete_permanent_user(db, usuario_id)
 
@@ -175,7 +187,8 @@ async def delete_user(
 )
 async def deactivate_user(
     usuario_id: int,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    current_user = Depends(get_current_active_user)
 ):
     db_usuario = usuario_service.deactivate_usuario(db, usuario_id)
 
@@ -196,7 +209,8 @@ async def deactivate_user(
 )
 async def activate_user(
     usuario_id: int,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    current_user = Depends(get_current_admin_user)
 ):
     db_usuario = usuario_service.activate_usuario(db, usuario_id)
 
