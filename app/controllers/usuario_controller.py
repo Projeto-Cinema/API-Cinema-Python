@@ -3,6 +3,7 @@ from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy.orm import Session
 
 from app.database import get_db
+from app.dependencies.auth import get_current_active_user
 from app.models.schemas.usuario_schema import UsuarioCreate, UsuarioResponse, UsuarioUpdate
 from app.service.usuario_service import usuario_service
 
@@ -32,7 +33,11 @@ async def create_user(
     summary="Obtém usuário por ID",
     description="Obtém os detalhes de um usuário específico pelo ID fornecido. Retorna um erro 404 se o usuário não for encontrado.",
 )
-async def get_user_by_id(usuario_id: int, db: Session = Depends(get_db)):
+async def get_user_by_id(
+    usuario_id: int, 
+    current_user = Depends(get_current_active_user), 
+    db: Session = Depends(get_db)
+):
     db_usuario = usuario_service.get_usuario_by_id(db, usuario_id)
 
     if not db_usuario:
