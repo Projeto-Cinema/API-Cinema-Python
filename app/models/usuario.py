@@ -9,7 +9,7 @@ class Usuario(BaseModel):
     email = Column(String(100), unique=True, nullable=False, index=True)
     senha = Column(String(255), nullable=False)
     dt_nascimento = Column(DateTime, nullable=True)
-    cpf = Column(String(14), unique=True, nullable=True)
+    cpf = Column(String(14), unique=True, nullable=False)
     telefone = Column(String(20), nullable=True)
     ativo = Column(Boolean, default=True, nullable=False)
     dt_cadastro = Column(DateTime, default=datetime.utcnow, nullable=False)
