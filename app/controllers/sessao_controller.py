@@ -3,6 +3,7 @@ from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy.orm import Session
 
 from app.database import get_db
+from app.dependencies.auth import get_current_active_user, get_current_admin_user
 from app.models.schemas.sessao_schema import SessaoCreate, SessaoResponse, SessaoUpdate
 from app.service.sessao_service import sessao_service
 
@@ -21,7 +22,8 @@ router = APIRouter(
 )
 def create_session(
     session_data: SessaoCreate,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    current_user = Depends(get_current_admin_user)
 ):
     created_session = sessao_service.create_session(db, session_data)
 
@@ -38,6 +40,7 @@ def get_all_sessions(
     skip: int = Query(0, ge=0, description="Número de sessões a serem puladas"),
     limit: int = Query(10, ge=1, le=100, description="Número máximo de sessões a serem retornadas"),
     db: Session = Depends(get_db),
+    current_user = Depends(get_current_active_user)
 ):
     sessions = sessao_service.get_all_sessions(db, skip=skip, limit=limit)
 
@@ -52,7 +55,8 @@ def get_all_sessions(
 )
 def get_session_by_id(
     session_id: int,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    current_user = Depends(get_current_admin_user)
 ):
     session = sessao_service.get_session_by_id(db, session_id)
 
@@ -74,7 +78,8 @@ def get_session_by_id(
 def update_session(
     session_id: int,
     session_data: SessaoUpdate,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    current_user = Depends(get_current_admin_user)
 ):
     updated_session = sessao_service.update_session(session_id, session_data, db)
 
@@ -94,7 +99,8 @@ def update_session(
 )
 def delete_session(
     session_id: int,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    current_user = Depends(get_current_admin_user)
 ):
     deleted_session = sessao_service.delete_session(db, session_id)
 
