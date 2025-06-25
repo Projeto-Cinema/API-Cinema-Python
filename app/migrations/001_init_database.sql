@@ -24,7 +24,7 @@ CREATE TABLE IF NOT EXISTS public.usuario (
     email VARCHAR(100) NOT NULL UNIQUE,
     senha VARCHAR(255) NOT NULL,
     dt_nascimento TIMESTAMP NULL,
-    cpf VARCHAR(14) NOT NULL,
+    cpf VARCHAR(14) NOT NULL UNIQUE,
     telefone VARCHAR(20) NULL,
     ativo BOOLEAN NOT NULL DEFAULT TRUE,
     dt_cadastro TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -33,7 +33,7 @@ CREATE TABLE IF NOT EXISTS public.usuario (
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
-    CONSTRAINT usuario_pk PRIMARY KEY (cpf)
+    CONSTRAINT usuario_pk PRIMARY KEY (id)
 );
 
 -- Tabela CINEMA
@@ -102,7 +102,7 @@ CREATE TABLE IF NOT EXISTS public.sala (
 
 CREATE TABLE IF NOT EXISTS public.filme (
     id SERIAL,
-    titulo VARHCAR(100) NOT NULL,
+    titulo VARCHAR(100) NOT NULL,
     titulo_original VARCHAR(100) NOT NULL,
     sinopse TEXT NOT NULL,
     duracao_min INTEGER NOT NULL,
@@ -122,7 +122,7 @@ CREATE TABLE IF NOT EXISTS public.filme (
     CHECK 
         (
             ano_lancamento > 1800 AND 
-            ano_lacamento <= EXTRACT(YEAR FROM CURRENT_DATE) + 5
+            ano_lancamento <= EXTRACT(YEAR FROM CURRENT_DATE) + 5
         )
 );
 
@@ -134,7 +134,7 @@ CREATE TABLE IF NOT EXISTS public.genero (
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
-    CONSTRAINT genero_pk PRIMARY KEY (id),
+    CONSTRAINT genero_pk PRIMARY KEY (id)
 );
 
 -- TABELA FILME_GENERO
@@ -147,7 +147,7 @@ CREATE TABLE IF NOT EXISTS public.filme_genero (
     CONSTRAINT filme_genero_filme_fk FOREIGN KEY (filme_id)
         REFERENCES public.filme (id) ON DELETE CASCADE,
     CONSTRAINT filme_genero_genero_fk FOREIGN KEY (genero_id)
-        REFERENCES public.genero (id) ON DELETE CASCADE,
+        REFERENCES public.genero (id) ON DELETE CASCADE
 );
 
 -- TABELA SESSAO

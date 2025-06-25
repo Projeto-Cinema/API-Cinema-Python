@@ -1,5 +1,3 @@
-BEGIN;
-
 ALTER TABLE public.reserva
     DROP COLUMN IF EXISTS assentos;
 
@@ -21,5 +19,3 @@ ALTER TABLE public.assento_sala
 DROP TABLE IF EXISTS public.reserva_assento;
 
 DROP TABLE IF EXISTS public.assento;
-
-COMMIT;
