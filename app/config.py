@@ -1,8 +1,17 @@
-from typing import Optional
-from pydantic_settings import BaseSettings
+"""Configuração do FastAPI com Pydantic e Pydantic Settings."""
+
 from pydantic import ConfigDict
+from pydantic_settings import BaseSettings
+
 
 class Settings(BaseSettings):
+    """Configurações do FastAPI usando Pydantic Settings.
+
+    Esta classe define as configurações do projeto, incluindo nome, versão,
+    descrição, URL do banco de dados, chave secreta, algoritmo de autenticação,
+    tempo de expiração do token de acesso e origens CORS permitidas.
+    """
+
     PROJECT_NAME: str = "Cinema API"
     PROJECT_VERSION: str = "1.0.0"
     PROJECT_DESCRIPTION: str = "API para gerenciamento de cinema"
@@ -15,9 +24,7 @@ class Settings(BaseSettings):
 
     CORS_ORIGINS: list[str] = ["*"]
 
-    model_config = ConfigDict(
-        env_file=".env",
-        env_file_encoding="utf-8"
-    )
+    model_config = ConfigDict(env_file=".env", env_file_encoding="utf-8")
+
 
 settings = Settings()
