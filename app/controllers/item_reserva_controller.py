@@ -4,6 +4,7 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
 from app.database import get_db
+from app.dependencies.auth import get_current_active_user, get_current_admin_user
 from app.models.schemas.item_reserva_schema import ItemReservaCreate, ItemReservaResponse
 
 from app.service.item_reserva_service import item_reserva_service
@@ -21,7 +22,8 @@ router = APIRouter(
 )
 def search_item_reserve(
     reserve_id: int,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    current_user = Depends(get_current_admin_user)
 ):
     itens = item_reserva_service.search_item_by_id(db, reserve_id)
 
@@ -37,7 +39,8 @@ def search_item_reserve(
 def add_item_reserve(
     reserve_id: int,
     item_data: ItemReservaCreate,
-    db: Session = Depends(get_db)       
+    db: Session = Depends(get_db),
+    current_user = Depends(get_current_active_user)       
 ):
     try:
         item = item_reserva_service.add_item_reserve(reserve_id, item_data, db)
@@ -54,7 +57,8 @@ def add_item_reserve(
 )
 def remove_item_reserve(
     item_id: int,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    current_user = Depends(get_current_active_user)
 ):
     try:
         success = item_reserva_service.remove_item_reserve(item_id, db)
