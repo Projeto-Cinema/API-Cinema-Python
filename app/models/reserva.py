@@ -78,6 +78,8 @@ class Reserva(BaseModel):
     
 
 class ItemReserva(BaseModel):
+    __tablename__ = "item_reserva"
+
     reserva_id = Column(Integer, ForeignKey("reserva.id"), nullable=False)
     item_id = Column(Integer, nullable=False)
     tipo = Column(String(20), nullable=False)  # assento ou produto
