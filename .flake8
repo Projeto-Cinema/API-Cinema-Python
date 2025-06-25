@@ -1,0 +1,17 @@
+[flake8]
+# Ignora erros específicos. W503 é conflito com o Black.
+# E501 é sobre o comprimento da linha, que o Black já cuida.
+ignore = E203, E501, W503
+
+# Define o comprimento máximo da linha (deve ser o mesmo do Black)
+max-line-length = 88
+
+# Define a complexidade máxima do código.
+max-complexity = 10
+
+# Configurações para o plugin flake8-import-order
+import-order-style = google
+
+[flake8:local-plugins]
+extension =
+    I = flake8_import_order:flake8_import_order.ImportOrderChecker
