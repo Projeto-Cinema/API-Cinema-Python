@@ -3,6 +3,7 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
 from app.database import get_db
+from app.dependencies.auth import get_current_active_user, get_current_admin_user
 from app.models.schemas.produto_schema import ProdutoCreate, ProdutoResponse, ProdutoUpdate
 from app.service.produto_service import produto_service
 
@@ -21,7 +22,8 @@ router = APIRouter(
 )
 async def create_product(
     product: ProdutoCreate,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    current_user = Depends(get_current_admin_user)
 ):
     return produto_service.create_product(db, product)
 
@@ -34,7 +36,8 @@ async def create_product(
 )
 async def get_product_by_id(
     product_id: int,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    current_user = Depends(get_current_admin_user)
 ):
     product = produto_service.get_product_by_id(db, product_id)
     
@@ -55,7 +58,8 @@ async def get_product_by_id(
 )
 async def get_product_by_name(
     product_name: str,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    current_user = Depends(get_current_active_user)
 ):
     product = produto_service.get_product_by_name(db, product_name)
     
@@ -78,7 +82,8 @@ async def get_products(
     skip: int = 0,
     limit: int = 100,
     ativo: bool = None,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    current_user = Depends(get_current_active_user)
 ):
     return produto_service.get_products(
         db,
@@ -97,7 +102,8 @@ async def get_products(
 async def update_product(
     product_id: int,
     product_data: ProdutoUpdate,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    current_user = Depends(get_current_admin_user)
 ):
     db_product = produto_service.update_product(db, product_id, product_data)
 
@@ -117,7 +123,8 @@ async def update_product(
 )
 async def parcial_delete_product(
     product_id: int,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    current_user = Depends(get_current_admin_user)
 ):
     success = produto_service.partial_delete_product(db, product_id)
 
@@ -137,7 +144,8 @@ async def parcial_delete_product(
 )
 async def permanent_delete_product(
     product_id: int,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    current_user = Depends(get_current_admin_user)
 ):
     success = produto_service.permanent_delete_product(db, product_id)
 
