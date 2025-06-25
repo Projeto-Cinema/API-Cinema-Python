@@ -3,6 +3,7 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
 from app.database import get_db
+from app.dependencies.auth import get_current_active_user, get_current_admin_user
 from app.models.schemas.reserva_schema import ReservaCreate, ReservaResponse, ReservaUpdate
 from app.service.reserva_service import reserva_service
 
@@ -19,7 +20,8 @@ router = APIRouter(
 )
 def create_reserve(
     reserva_data: ReservaCreate,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    current_user = Depends(get_current_active_user)
 ):
     try:
         return reserva_service.create_reservation(db, reserva_data)
@@ -40,7 +42,8 @@ def create_reserve(
 )
 def get_reservation_by_id(
     reserva_id: int,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    current_user = Depends(get_current_admin_user)
 ):
     reserva = reserva_service.get_reservation_by_id(db, reserva_id)
     if not reserva:
@@ -59,7 +62,8 @@ def get_reservation_by_id(
 )
 def get_reservation_by_code(
     codigo: str,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    current_user = Depends(get_current_active_user)
 ):
     reserva = reserva_service.get_reservation_by_code(db, codigo)
     if not reserva:
@@ -78,7 +82,8 @@ def get_reservation_by_code(
 )
 def list_reservations_by_user(
     usuario_id: int,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    current_user = Depends(get_current_active_user)
 ):
     reservas = reserva_service.list_reservations_by_user(db, usuario_id)
     if not reservas:
@@ -98,7 +103,8 @@ def list_reservations_by_user(
 def update_reserve(
     reserve_id: int,
     reserve_data: ReservaUpdate,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    current_user = Depends(get_current_active_user)
 ):
     try:
         reserve = reserva_service.update_reservation(db, reserve_id, reserve_data)
@@ -122,7 +128,8 @@ def update_reserve(
 )
 def cancel_reservation(
     reserve_id: int,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    current_user = Depends(get_current_active_user)
 ):
     try:
         reserve = reserva_service.cancel_reservation(db, reserve_id)
@@ -146,7 +153,8 @@ def cancel_reservation(
 def confirm_reservation(
     reserve_id: int,
     method: str,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    current_user = Depends(get_current_active_user)
 ):
     try:
         reserve = reserva_service.confirm_reservation(db, reserve_id, method)
@@ -168,7 +176,8 @@ def confirm_reservation(
 )    
 def delete_reservation(
     reserve_id: int,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    current_user = Depends(get_current_active_user)
 ):
     try:
         result = reserva_service.delete_reservation(db, reserve_id)
