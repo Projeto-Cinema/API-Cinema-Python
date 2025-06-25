@@ -4,6 +4,7 @@ from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy.orm import Session
 
 from app.database import get_db
+from app.dependencies.auth import get_current_active_user, get_current_admin_user
 from app.models.schemas.filme_schema import FilmeCreate, FilmeResponse, FilmeUpdate
 from app.service.filme_service import filme_service
 
@@ -22,7 +23,8 @@ router = APIRouter(
 )
 async def create_movie(
     movie_data: FilmeCreate,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    current_user = Depends(get_current_admin_user)
 ):
     return filme_service.create_movie(db, movie_data)
 
@@ -35,6 +37,7 @@ async def create_movie(
 )
 async def get_all_movies(
     db: Session = Depends(get_db),
+    current_user = Depends(get_current_active_user),
     skip: int = Query(0, ge=0, description="Número de registros a serem pulados para paginação"),
     limit: int = Query(100, ge=1, le=100, description="Número máximo de registros a serem retornados"),
     em_cartaz: Optional[bool] = Query(None, description="Filtrar filmes em cartaz (True) ou não (False), se fornecido"),
@@ -61,7 +64,8 @@ async def get_all_movies(
 )
 async def get_movie_by_id(
     movie_id: int,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    current_user = Depends(get_current_admin_user)
 ):
     db_movie = filme_service.get_movie_by_id(db, movie_id)
 
@@ -82,7 +86,8 @@ async def get_movie_by_id(
 )
 async def get_movie_by_title(
     title: str = Query(..., alias='titulo'),
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    current_user = Depends(get_current_active_user)
 ):
     db_movie = filme_service.get_movie_by_title(db, title)
 
@@ -104,7 +109,8 @@ async def get_movie_by_title(
 async def update_movie(
     movie_id: int,
     movie_data: FilmeUpdate,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    current_user = Depends(get_current_admin_user)
 ):
     db_movie = filme_service.update_movie(db, movie_id, movie_data)
 
@@ -124,7 +130,8 @@ async def update_movie(
 )
 async def delete_permanent_movie(
     movie_id: int,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    current_user = Depends(get_current_admin_user)
 ):
     success = filme_service.delete_permanent_movie(db, movie_id)
 
