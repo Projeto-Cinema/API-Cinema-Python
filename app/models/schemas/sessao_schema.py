@@ -18,7 +18,6 @@ class SessaoBase(BaseModel):
 class SessaoCreate(SessaoBase):
     filme_id: int
     sala_id: int
-    assento_id: int
 
 class SessaoUpdate(BaseModel):
     data: Optional[date] = None
@@ -34,7 +33,6 @@ class SessaoResponse(SessaoBase):
     id: int
     filme_id: int
     sala_id: int
-    assento_id: int
 
     class Config:
         from_attributes = True

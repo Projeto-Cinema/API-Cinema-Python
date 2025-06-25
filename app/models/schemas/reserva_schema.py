@@ -12,7 +12,6 @@ class ReservaBase(BaseModel):
     status: StatusReservaEnum = StatusReservaEnum.PENDENTE
     valor_total: float = Field(ge=0)
     metodo_pagamento: Optional[str] = Field(None, max_length=50)
-    assentos: str
 
 class ReservaCreate(ReservaBase):
     usuario_id: int
@@ -24,7 +23,6 @@ class ReservaUpdate(BaseModel):
     status: Optional[StatusReservaEnum] = None
     valor_total: Optional[float] = Field(None, ge=0)
     metodo_pagamento: Optional[str] = Field(None, max_length=50)
-    assentos: Optional[str] = None
 
 class ReservaResponse(ReservaBase):
     id: int
