@@ -160,8 +160,8 @@ async def verify_payment_status(
     db: Session = Depends(get_db)
 ):
     try:
-        status_payment = payment_service.verify_payment_status(payment_id, db)
-        return {"payment_id": payment_id, "status": status_payment}
+        status_payment = payment_service.get_payment_by_id(payment_id, db)
+        return status_payment
     except NotFoundError as e:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
