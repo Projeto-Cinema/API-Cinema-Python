@@ -66,7 +66,7 @@ CREATE TABLE IF NOT EXISTS public.produto (
     descricao TEXT NULL,
     categoria VARCHAR(50) NOT NULL,
     preco DECIMAL(10, 2) NOT NULL,
-    imagme_url VARCHAR(255) NULL,
+    imagem_url VARCHAR(255) NULL,
     disponivel BOOLEAN NOT NULL DEFAULT TRUE,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
