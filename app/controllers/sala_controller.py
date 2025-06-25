@@ -4,6 +4,7 @@ from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy.orm import Session
 
 from app.database import get_db
+from app.dependencies.auth import get_current_admin_user
 from app.models.schemas.sala_schema import SalaCreate, SalaResponse, SalaUpdate
 from app.service.sala_service import sala_service
 
@@ -22,7 +23,8 @@ router = APIRouter(
 )
 async def create_room(
     room: SalaCreate,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    current_user = Depends(get_current_admin_user)
 ):
     return sala_service.create_room(db, room)
 
@@ -35,7 +37,8 @@ async def create_room(
 )
 async def get_room_by_id(
     room_id: int,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    current_user = Depends(get_current_admin_user)
 ):
     db_room = sala_service.get_room_by_id(db, room_id)
 
@@ -58,7 +61,8 @@ async def get_all_rooms(
     db: Session = Depends(get_db),
     skip: int = Query(0, ge=0, description="Número de registros a serem pulados para paginação"),
     limit: int = Query(100, ge=1, le=100, description="Número máximo de registros a serem retornados"),
-    ativo: Optional[bool] = Query(None, description="Filtrar salas ativas (True) ou inativas (False), se fornecido")
+    ativo: Optional[bool] = Query(None, description="Filtrar salas ativas (True) ou inativas (False), se fornecido"),
+    current_user = Depends(get_current_admin_user)
 ):
     return sala_service.get_all_rooms(db, skip=skip, limit=limit, ativo=ativo)
 
@@ -72,7 +76,8 @@ async def get_all_rooms(
 async def update_room(
     room_id: int,
     room_data: SalaUpdate,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    current_user = Depends(get_current_admin_user)
 ):
     db_room = sala_service.update_room(db, room_id, room_data)
 
@@ -92,7 +97,8 @@ async def update_room(
 )
 async def soft_delete_room(
     room_id: int,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    current_user = Depends(get_current_admin_user)
 ):
     success = sala_service.parcial_delete_room(db, room_id)
 
@@ -110,7 +116,8 @@ async def soft_delete_room(
 )
 async def delete_room(
     room_id: int,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    current_user = Depends(get_current_admin_user)
 ):
     success = sala_service.delete_room(db, room_id)
 
