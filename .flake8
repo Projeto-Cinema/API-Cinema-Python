@@ -8,6 +8,3 @@ max-line-length = 88
 
 # Define a complexidade máxima do código.
 max-complexity = 10
-
-# Configurações para o plugin flake8-import-order
-import-order-style = google
