@@ -6,6 +6,7 @@ from passlib.context import CryptContext
 
 from sqlalchemy.orm import Session
 
+from app.models.assento_sala import AssentoSala
 from app.models.reserva import ItemReserva, Reserva
 from app.models.schemas.enum.enum_util import StatusReservaEnum
 from app.models.schemas.item_reserva_schema import ItemReservaCreate
@@ -22,6 +23,54 @@ class ReservaService:
             code = ''.join(secrets.choices(string.ascii_uppercase + string.digits, k=8))
             if not db.query(Reserva).filter(Reserva.codigo == code).first():
                 return code
+
+    def _get_user_or_404(self, db: Session, user_id: int) -> Usuario:
+        user = db.query(Usuario).filter(Usuario.id == user_id).first()
+        if not user:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Usuário não encontrado."
+            )
+        return user
+    
+    def _get_session_or_404(self, db: Session, session_id: int) -> Sessao:
+        session = db.query(Sessao).filter(Sessao.id == session_id).first()
+        if not session:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Sessão não encontrada."
+            )
+        return session
+    
+    def _validate_itens(self, db: Session, session: Sessao, itens: List[ItemReservaCreate]) -> float:
+        value_total = 0.0
+
+        for item_data in itens:
+            if item_data.tipo == "assento":
+                seat = db.query(AssentoSala).filter(AssentoSala.id == item_data.item_id).first()
+
+                if not seat:
+                    raise HTTPException(
+                        status_code=status.HTTP_404_NOT_FOUND,
+                        detail=f"Assento com ID {item_data.item_id} não encontrado."
+                    )
+                
+                if seat.is_session_reserved(session.id):
+                    raise HTTPException(
+                        status_code=status.HTTP_400_BAD_REQUEST,
+                        detail=f"Assento {seat.numero} já está reservado para esta sessão."
+                    )
+                
+                correct_price = session.calculate_seat_price(seat.id)
+                if abs(correct_price - item_data.preco_unitario) > 0.01:
+                    raise HTTPException(
+                        status_code=status.HTTP_400_BAD_REQUEST,
+                        detail=f"Preço incorreto para o assento {seat.numero}. Esperado: {correct_price}, recebido: {item_data.preco_unitario}."
+                    )
+                
+            value_total += item_data.preco_total
+
+        return value_total
             
     def _calculate_total_item_value(self, itens: List[ItemReservaCreate]) -> float:
         total = 0
@@ -39,26 +88,17 @@ class ReservaService:
         return db.query(Sessao).filter(Sessao.id == sessao_id).first() is not None
     
     def create_reservation(self, db: Session, reserve_data: ReservaCreate) -> Reserva:
-        if not self._validate_if_exists_user(db, reserve_data.usuario_id):
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail="Usuário não encontrado."
-            )
-        
-        if not self._validate_if_exists_session(db, reserve_data.sessao_id):
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail="Sessão não encontrada."
-            )
+        self._get_user_or_404(db, reserve_data.usuario_id)
+        session = self._get_session_or_404(db, reserve_data.sessao_id)
         
         if reserve_data.itens:
-            total_value = self._calculate_total_item_value(reserve_data.items)
+            total_value = self._validate_itens(db, session, reserve_data.itens)
             if abs(total_value - reserve_data.valor_total) > 0.01:
                 raise HTTPException(
                     status_code=status.HTTP_400_BAD_REQUEST,
                     detail="O valor total não corresponde à soma dos itens."
                 )
-
+        
         reserve = Reserva(
             usuario_id=reserve_data.usuario_id,
             sessao_id=reserve_data.sessao_id,
@@ -66,23 +106,14 @@ class ReservaService:
             data_reserva=reserve_data.data_reserva,
             status=reserve_data.status.value,
             valor_total=reserve_data.valor_total,
-            metodo_pagamento=reserve_data.metodo_pagamento,
-            assentos=reserve_data.assentos
+            metodo_pagamento=reserve_data.metodo_pagamento
         )
 
         db.add(reserve)
         db.flush()
 
         for item_data in reserve_data.itens:
-            item = ItemReserva(
-                reserva_id=reserve.id,
-                item_id=item_data.item_id,
-                tipo=item_data.tipo,
-                quantidade=item_data.quantidade,
-                preco_unitario=item_data.preco_unitario,
-                preco_total=item_data.preco_total,
-                desconto=item_data.desconto
-            )
+            item = ItemReserva(**item_data.dict(), reserva_id=reserve.id)
             db.add(item)
 
         db.commit()
