@@ -3,6 +3,7 @@ from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy.orm import Session
 
 from app.database import get_db
+from app.dependencies.auth import get_current_active_user, get_current_admin_user
 from app.exceptions.custom_exceptions import NotFoundError, ValidationError
 from app.models.schemas.pagamento_schema import PagamentoCreate, PagamentoResponse, PagamentoUpdate
 from app.service.pagamento_service import payment_service
@@ -22,7 +23,8 @@ router = APIRouter(
 )
 async def create_payment(
     payment_data: PagamentoCreate,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    current_user = Depends(get_current_active_user)
 ):
     try:
         payment = payment_service.create_payment(payment_data, db)
@@ -47,7 +49,8 @@ async def create_payment(
 )    
 async def get_payment_by_id(
     payment_id: int,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    current_user = Depends(get_current_admin_user)
 ):
     try:
         payment = payment_service.get_payment_by_id(payment_id, db)
@@ -67,7 +70,8 @@ async def get_payment_by_id(
 )    
 async def get_payment_by_reservation_id(
     reservation_id: int,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    current_user = Depends(get_current_active_user)
 ):
     payment = payment_service.get_payment_by_reservation_id(reservation_id, db)
     if not payment:
@@ -88,7 +92,8 @@ async def get_all_payments(
     skip: int = Query(0, ge=0, description="Number of payments to skip"),
     limit: int = Query(100, ge=1, le=1000, description="Maximum number of payments to return"),
     status: str = Query(None, description="Filter payments by status"),
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    current_user = Depends(get_current_admin_user)
 ):
     if status:
         payments = payment_service.get_all_payments_by_status(db, status, skip, limit)
@@ -107,7 +112,8 @@ async def get_all_payments(
 async def update_payment(
     payment_id: int,
     payment_data: PagamentoUpdate,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    current_user = Depends(get_current_active_user)
 ):
     try:
         payment = payment_service.update_payment(payment_id, payment_data, db)
@@ -132,7 +138,8 @@ async def update_payment(
 )
 async def process_payment(
     payment_id: int,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    current_user = Depends(get_current_active_user)
 ):
     try:
         payment = payment_service.process_payment(payment_id, db)
@@ -157,7 +164,8 @@ async def process_payment(
 )
 async def verify_payment_status(
     payment_id: int,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    current_user = Depends(get_current_active_user)
 ):
     try:
         status_payment = payment_service.get_payment_by_id(payment_id, db)
@@ -176,7 +184,8 @@ async def verify_payment_status(
 )
 async def generate_voucher(
     payment_id: int,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    current_user = Depends(get_current_active_user)
 ):
     try:
         voucher = payment_service.generate_voucher(payment_id, db)
@@ -200,7 +209,8 @@ async def generate_voucher(
 )
 async def delete_payment(
     payment_id: int,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    current_user = Depends(get_current_admin_user)
 ):
     try:
         payment_service.delete_payment(payment_id, db)
