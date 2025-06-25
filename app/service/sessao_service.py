@@ -4,9 +4,7 @@ from passlib.context import CryptContext
 
 from sqlalchemy.orm import Session, joinedload
 
-from app.models.assento import Assento
 from app.models.sala import Sala
-from app.models.schemas.enum.enum_util import StatusAssentoEnum
 from app.models.schemas.sessao_schema import SessaoCreate, SessaoUpdate
 from app.models.sessao import Sessao
 
@@ -21,7 +19,7 @@ class SessaoService:
         start_time: str,
         end_time: str,
         exclude_session_id: int = None
-    ):
+    ) -> Optional[Sessao]:
         query = db.query(Sessao).filter(
             Sessao.sala_id == room_id,
             Sessao.horario_ini < end_time,
@@ -38,7 +36,7 @@ class SessaoService:
         db: Session,
         session_data: SessaoCreate
     ) -> Sessao:
-        sala = db.query(Sala).options(joinedload(Sala.assentos)).filter(Sala.id == session_data.sala_id).first()
+        sala = db.query(Sala).filter(Sala.id == session_data.sala_id).first()
         if not sala:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
@@ -56,20 +54,10 @@ class SessaoService:
                 detail="Conflito de horário na sala."
             )
         
-        session_dict = session_data.model_dump(exclude={"assento_id"})
+        session_dict = session_data.model_dump()
         db_session = Sessao(**session_dict)
 
-        seat_create = []
-        for seat_room in sala.assentos:
-            new_seat = Assento(
-                sessao_id=db_session.id,
-                assento_sala_id=seat_room.id,
-                preco=db_session.preco_base,
-                status=StatusAssentoEnum.DISPONIVEL.value
-            )
-            seat_create.append(new_seat)
-
-        db.add_all(seat_create)
+        db.add(db_session)
         db.commit()
         db.refresh(db_session)
 
