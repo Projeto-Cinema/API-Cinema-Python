@@ -17,6 +17,7 @@ from app.controllers.sessao_controller import router as sessao_router
 from app.controllers.reserva_controller import router as reserva_router
 from app.controllers.item_reserva_controller import router as item_reserva_router
 from app.controllers.payment_controller import router as pagamento_router
+from app.controllers.auth_controller import router as auth_router   
 
 app = FastAPI(
     title=settings.PROJECT_NAME,
@@ -24,6 +25,7 @@ app = FastAPI(
     description=settings.PROJECT_DESCRIPTION,
 )
 
+app.include_router(auth_router, prefix="/api/v1", tags=["Auth"])
 app.include_router(usuario_router, prefix="/api/v1", tags=["Users"])
 app.include_router(endereco_router, prefix="/api/v1", tags=["Address"])
 app.include_router(cinema_router, prefix="/api/v1", tags=["Cinema"])
