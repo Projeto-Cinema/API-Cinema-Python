@@ -1,9 +1,10 @@
 from re import M
 from typing import Dict, List
 from venv import create
-import pytest
 
+import pytest
 from fastapi import status
+
 
 class TestUsuarioController:
 
@@ -13,9 +14,13 @@ class TestUsuarioController:
             "nome": "Wesley",
             "email": "wesley@gmail.com",
             "senha": "senha123",
-            "telefone": "1234567890"
+            "cpf": "12345678901",
+            "telefone": "1234567890",
+            "ativo": True,
+            "dt_cadastro": "2023-10-01T00:00:00",
+            "tipo": "cliente",
         }
-    
+
     def test_create_user_integration(self, client, usuario_data):
         response = client.post("api/v1/Users", json=usuario_data)
 
@@ -42,6 +47,7 @@ class TestUsuarioController:
         response2 = client.post("api/v1/Users", json=usuario_data)
         assert response2.status_code == status.HTTP_400_BAD_REQUEST
 
+
 class TestUsuarioGetByID:
 
     @pytest.fixture
@@ -50,15 +56,19 @@ class TestUsuarioGetByID:
             "nome": "Wesley",
             "email": "wesley@gmail.com",
             "senha": "senha123",
-            "telefone": "1234567890"
+            "cpf": "12345678901",
+            "telefone": "1234567890",
+            "ativo": True,
+            "dt_cadastro": "2023-10-01T00:00:00",
+            "tipo": "cliente",
         }
-    
+
     @pytest.fixture
     def create_user(self, client, usuario_data):
         response = client.post("api/v1/Users", json=usuario_data)
         assert response.status_code == status.HTTP_201_CREATED
         return response.json()
-    
+
     def test_get_user_by_id_integration_success(self, client, create_user):
         user_id = create_user["id"]
 
@@ -72,6 +82,7 @@ class TestUsuarioGetByID:
         assert response_data["email"] == create_user["email"]
         assert response_data["telefone"] == create_user["telefone"]
 
+
 class TestUsuarioGetByEmail:
 
     @pytest.fixture
@@ -80,15 +91,19 @@ class TestUsuarioGetByEmail:
             "nome": "Wesley",
             "email": "wesley@gmail.com",
             "senha": "senha123",
-            "telefone": "1234567890"
+            "cpf": "12345678901",
+            "telefone": "1234567890",
+            "ativo": True,
+            "dt_cadastro": "2023-10-01T00:00:00",
+            "tipo": "cliente",
         }
-    
+
     @pytest.fixture
     def create_user(self, client, usuario_data):
         response = client.post("api/v1/Users", json=usuario_data)
         assert response.status_code == status.HTTP_201_CREATED
         return response.json()
-    
+
     def test_get_user_by_email_integration_success(self, client, create_user):
         user_email = create_user["email"]
 
@@ -102,6 +117,7 @@ class TestUsuarioGetByEmail:
         assert response_data["email"] == user_email
         assert response_data["telefone"] == create_user["telefone"]
 
+
 class TestUsuarioGetByCPF:
 
     @pytest.fixture
@@ -109,17 +125,20 @@ class TestUsuarioGetByCPF:
         return {
             "nome": "Wesley",
             "email": "wesley@gmail.com",
-            "cpf": "12345678901",
             "senha": "senha123",
-            "telefone": "1234567890"
+            "cpf": "12345678901",
+            "telefone": "1234567890",
+            "ativo": True,
+            "dt_cadastro": "2023-10-01T00:00:00",
+            "tipo": "cliente",
         }
-    
+
     @pytest.fixture
     def create_user(self, client, usuario_data):
         response = client.post("api/v1/Users", json=usuario_data)
         assert response.status_code == status.HTTP_201_CREATED
         return response.json()
-    
+
     def test_get_user_by_cpf_integration_success(self, client, create_user):
         user_cpf = create_user["cpf"]
 
@@ -134,14 +153,42 @@ class TestUsuarioGetByCPF:
         assert response_data["cpf"] == user_cpf
         assert response_data["telefone"] == create_user["telefone"]
 
+
 class TestUsuarioGetAll:
 
     @pytest.fixture(scope="class")
     def usuarios_data(self) -> List[Dict]:
         return [
-            {"nome": "wesley", "email": "wesley@gmail.com", "cpf": "1111111111", "senha": "senha123", "telefone": "1234567890", "tipo": "cliente", "ativo": True},
-            {"nome": "maria", "email": "maria@gmail.com", "cpf": "2222222222", "senha": "senha123", "telefone": "0987654321", "tipo": "cliente", "ativo": True},
-            {"nome": "joao", "email": "joao@gmail.com", "cpf": "3333333333", "senha": "senha123", "telefone": "1122334455", "tipo": "cliente", "ativo": False},
+            {
+                "nome": "wesley",
+                "email": "wesley@gmail.com",
+                "senha": "senha123",
+                "cpf": "1111111111",
+                "telefone": "1234567890",
+                "ativo": True,
+                "dt_cadastro": "2023-10-01T00:00:00",
+                "tipo": "cliente",
+            },
+            {
+                "nome": "maria",
+                "email": "maria@gmail.com",
+                "senha": "senha123",
+                "cpf": "2222222222",
+                "telefone": "0987654321",
+                "ativo": True,
+                "dt_cadastro": "2023-10-01T00:00:00",
+                "tipo": "cliente",
+            },
+            {
+                "nome": "joao",
+                "email": "joao@gmail.com",
+                "senha": "senha123",
+                "cpf": "3333333333",
+                "telefone": "1122334455",
+                "ativo": False,
+                "dt_cadastro": "2023-10-01T00:00:00",
+                "tipo": "cliente",
+            },
         ]
 
     @pytest.fixture()
@@ -150,12 +197,15 @@ class TestUsuarioGetAll:
             response = client.post("api/v1/Users", json=user_data)
             assert response.status_code == status.HTTP_201_CREATED
 
-    def test_list_all_users_without_filters(self, client, usuarios_data: List[Dict], create_users):
+    def test_list_all_users_without_filters(
+        self, client, usuarios_data: List[Dict], create_users
+    ):
         response = client.get("api/v1/Users")
 
         assert response.status_code == status.HTTP_200_OK
 
         assert len(response.json()) == len(usuarios_data)
+
 
 class TestUsuarioUpdate:
 
@@ -163,28 +213,34 @@ class TestUsuarioUpdate:
     def usuario_data(self):
         return {
             "nome": "Wesley",
-            "email": "weslin@gmail.com",
-            "cpf": "12345678901",
+            "email": "wesley@gmail.com",
             "senha": "senha123",
+            "cpf": "12345678901",
             "telefone": "1234567890",
+            "ativo": True,
+            "dt_cadastro": "2023-10-01T00:00:00",
+            "tipo": "cliente",
         }
-    
+
     @pytest.fixture
     def create_user(self, client, usuario_data):
         response = client.post("api/v1/Users", json=usuario_data)
         assert response.status_code == status.HTTP_201_CREATED
         return response.json()
-    
+
     def test_update_user_integration_success(self, client, create_user):
         user_id = create_user["id"]
 
-        response = client.put(f"/api/v1/Users/{user_id}", json={
-            "nome": "Wesley Updated",
-            "email": "weslin@gmail.com",
-            "cpf": "11111111111",
-            "senha": "newpassword123",
-            "telefone": "0987654321"
-        })
+        response = client.put(
+            f"/api/v1/Users/{user_id}",
+            json={
+                "nome": "Wesley Updated",
+                "email": "weslin@gmail.com",
+                "cpf": "11111111111",
+                "senha": "newpassword123",
+                "telefone": "0987654321",
+            },
+        )
 
         assert response.status_code == status.HTTP_200_OK
 
@@ -194,24 +250,28 @@ class TestUsuarioUpdate:
         assert response_data["nome"] != create_user["nome"]
         assert response_data["email"] == create_user["email"]
 
+
 class TestUsuarioDelete:
 
     @pytest.fixture
     def usuario_data(self):
         return {
             "nome": "Wesley",
-            "email": "weslin@gmail.com",
-            "cpf": "12345678901",
+            "email": "wesley@gmail.com",
             "senha": "senha123",
+            "cpf": "12345678901",
             "telefone": "1234567890",
+            "ativo": True,
+            "dt_cadastro": "2023-10-01T00:00:00",
+            "tipo": "cliente",
         }
-    
+
     @pytest.fixture
     def create_user(self, client, usuario_data):
         response = client.post("api/v1/Users", json=usuario_data)
         assert response.status_code == status.HTTP_201_CREATED
         return response.json()
-    
+
     def test_delete_user_partial_integration_success(self, client, create_user):
         user_id = create_user["id"]
 
@@ -223,24 +283,28 @@ class TestUsuarioDelete:
         response_data_get = response_get.json()
         assert response_data_get["ativo"] is False
 
+
 class TestUsuarioPermanentDelete:
 
     @pytest.fixture
     def usuario_data(self):
         return {
             "nome": "Wesley",
-            "email": "weslin@gmail.com",
-            "cpf": "12345678901",
+            "email": "wesley@gmail.com",
             "senha": "senha123",
+            "cpf": "12345678901",
             "telefone": "1234567890",
+            "ativo": True,
+            "dt_cadastro": "2023-10-01T00:00:00",
+            "tipo": "cliente",
         }
-    
+
     @pytest.fixture
     def create_user(self, client, usuario_data):
         response = client.post("api/v1/Users", json=usuario_data)
         assert response.status_code == status.HTTP_201_CREATED
         return response.json()
-    
+
     def test_delete_user_permanent_integration_success(self, client, create_user):
         user_id = create_user["id"]
 
@@ -251,25 +315,28 @@ class TestUsuarioPermanentDelete:
         response_get = client.get(f"/api/v1/Users/{user_id}")
         assert response_get.status_code == status.HTTP_404_NOT_FOUND
 
+
 class TestUsuarioDeactivate:
 
     @pytest.fixture
     def usuario_data(self):
         return {
             "nome": "Wesley",
-            "email": "weslin@gmail.com",
-            "cpf": "12345678901",
+            "email": "wesley@gmail.com",
             "senha": "senha123",
-            "ativo": True,
+            "cpf": "12345678901",
             "telefone": "1234567890",
+            "ativo": True,
+            "dt_cadastro": "2023-10-01T00:00:00",
+            "tipo": "cliente",
         }
-    
+
     @pytest.fixture
     def create_user(self, client, usuario_data):
         response = client.post("api/v1/Users", json=usuario_data)
         assert response.status_code == status.HTTP_201_CREATED
         return response.json()
-    
+
     def test_deactivate_user_integration_success(self, client, create_user):
         user_id = create_user["id"]
 
@@ -281,25 +348,28 @@ class TestUsuarioDeactivate:
         assert response_data["id"] == user_id
         assert response_data["ativo"] is False
 
+
 class TestUsuarioActivate:
 
     @pytest.fixture
     def usuario_data(self):
         return {
             "nome": "Wesley",
-            "email": "weslin@gmail.com",
-            "cpf": "12345678901",
+            "email": "wesley@gmail.com",
             "senha": "senha123",
-            "ativo": False,
+            "cpf": "12345678901",
             "telefone": "1234567890",
+            "ativo": True,
+            "dt_cadastro": "2023-10-01T00:00:00",
+            "tipo": "cliente",
         }
-    
+
     @pytest.fixture
     def create_user(self, client, usuario_data):
         response = client.post("api/v1/Users", json=usuario_data)
         assert response.status_code == status.HTTP_201_CREATED
         return response.json()
-    
+
     def test_activate_user_integration_success(self, client, create_user):
         user_id = create_user["id"]
 
