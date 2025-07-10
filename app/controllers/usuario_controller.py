@@ -10,6 +10,7 @@ from app.models.schemas.usuario_schema import (
     UsuarioResponse,
     UsuarioUpdate,
 )
+from app.models.usuario import Usuario
 from app.service.usuario_service import usuario_service
 
 router = APIRouter(
@@ -28,6 +29,33 @@ router = APIRouter(
 async def create_user(user: UsuarioCreate, db: Session = Depends(get_db)):
     return usuario_service.create_user(db, user)
 
+@router.get(
+    "/me",
+    response_model=UsuarioResponse,
+    summary="Obtém informações do usuário atual",
+)
+async def read_user_me(
+    current_user: Usuario = Depends(get_current_active_user)
+):
+    return current_user
+
+@router.put(
+    "/me",
+    response_model=UsuarioResponse,
+    summary="Atualiza informações do usuário atual",
+)
+async def update_user_me(
+    user_data: UsuarioUpdate,
+    db: Session = Depends(get_db),
+    current_user: Usuario = Depends(get_current_active_user)
+):
+    updated_user = usuario_service.update_usuarios(
+        db=db,
+        usuario_id=current_user.id,
+        usuario_data=user_data
+    )
+
+    return updated_user
 
 @router.get(
     "/{usuario_id}",
