@@ -69,6 +69,16 @@ class SessaoService:
         session_id: int
     ) -> Optional[Sessao]:
         return db.query(Sessao).filter(Sessao.id == session_id).first()
+
+    def get_sessions_by_cinema_id(
+        self,
+        db: Session,
+        cinema_id: int
+    ) -> List[Sessao]:
+        return db.query(Sessao).filter(
+            Sessao.filme_id == cinema_id,
+            Sessao.status == 'ativa'
+        ).all()
     
     def get_all_sessions(
         self,

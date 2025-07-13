@@ -68,6 +68,28 @@ def get_session_by_id(
 
     return session
 
+@router.get(
+    "/{cinema_id}/sessions",
+    response_model=list[SessaoResponse],
+    status_code=status.HTTP_200_OK,
+    summary="Obtém uma lista de sessões do cinema pelo ID",
+    description="Obtém os detalhes de uma lista de sessões de cinema específica pelo seu ID."
+)
+def get_sessions_by_cinema_id(
+    cinema_id: int,
+    db: Session = Depends(get_db),
+    current_user = Depends(get_current_active_user)
+):
+    session = sessao_service.get_sessions_by_cinema_id(db, cinema_id)
+
+    if not session:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Sessões do ID cinema {cinema_id} não foram encontradas."
+        )
+
+    return session
+
 @router.put(
     "/{session_id}",
     response_model=SessaoResponse,
