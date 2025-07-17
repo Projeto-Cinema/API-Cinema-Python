@@ -25,6 +25,7 @@ class ReservaUpdate(BaseModel):
 
 class ReservaResponse(ReservaBase):
     id: int
+    codigo: str
     usuario_id: int
     sessao_id: int
     created_at: datetime

@@ -85,7 +85,7 @@ def list_reservations_by_user(
     db: Session = Depends(get_db),
     current_user = Depends(get_current_active_user)
 ):
-    reservas = reserva_service.list_reservations_by_user(db, usuario_id)
+    reservas = reserva_service.list_reservation_by_user(db, usuario_id)
     if not reservas:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
