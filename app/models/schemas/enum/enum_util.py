@@ -3,7 +3,7 @@ from enum import Enum
 
 class StatusReservaEnum(str, Enum):
     PENDENTE = "pendente"
-    CONFIRMADA = "confirmado"
+    CONFIRMADA = "confirmada"
     CANCELADA = "cancelada"
     EXPIRADA = "expirado"
 
