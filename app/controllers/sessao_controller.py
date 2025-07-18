@@ -56,7 +56,7 @@ def get_all_sessions(
 def get_session_by_id(
     session_id: int,
     db: Session = Depends(get_db),
-    current_user = Depends(get_current_admin_user)
+    current_user = Depends(get_current_active_user)
 ):
     session = sessao_service.get_session_by_id(db, session_id)
 

@@ -43,7 +43,7 @@ def create_reserve(
 def get_reservation_by_id(
     reserva_id: int,
     db: Session = Depends(get_db),
-    current_user = Depends(get_current_admin_user)
+    current_user = Depends(get_current_active_user)
 ):
     reserva = reserva_service.get_reservation_by_id(db, reserva_id)
     if not reserva:

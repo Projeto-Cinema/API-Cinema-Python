@@ -4,7 +4,7 @@ from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy.orm import Session
 
 from app.database import get_db
-from app.dependencies.auth import get_current_admin_user
+from app.dependencies.auth import get_current_active_user, get_current_admin_user
 from app.models.schemas.sala_schema import SalaCreate, SalaResponse, SalaUpdate
 from app.service.sala_service import sala_service
 
@@ -38,7 +38,7 @@ async def create_room(
 async def get_room_by_id(
     room_id: int,
     db: Session = Depends(get_db),
-    current_user = Depends(get_current_admin_user)
+    current_user = Depends(get_current_active_user)
 ):
     db_room = sala_service.get_room_by_id(db, room_id)
 
