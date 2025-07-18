@@ -37,7 +37,6 @@ async def create_movie(
 )
 async def get_all_movies(
     db: Session = Depends(get_db),
-    current_user = Depends(get_current_active_user),
     skip: int = Query(0, ge=0, description="Número de registros a serem pulados para paginação"),
     limit: int = Query(100, ge=1, le=100, description="Número máximo de registros a serem retornados"),
     em_cartaz: Optional[bool] = Query(None, description="Filtrar filmes em cartaz (True) ou não (False), se fornecido"),
@@ -86,8 +85,7 @@ async def get_movie_by_id(
 )
 async def get_movie_by_title(
     title: str = Query(..., alias='titulo'),
-    db: Session = Depends(get_db),
-    current_user = Depends(get_current_active_user)
+    db: Session = Depends(get_db)
 ):
     db_movie = filme_service.get_movie_by_title(db, title)
 
