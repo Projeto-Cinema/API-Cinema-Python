@@ -76,3 +76,11 @@ Para trabalhar com o projeto localmente, faça:
 ```bash
     uvicorn main:app --reload
 ```
+
+## Diagrama de UML
+
+![DiagramaUML](images/API%20Cinema.png)
+
+## Diagrama Físico do Banco
+
+![DiagramaFisico](images/diagrama_físico.png)
