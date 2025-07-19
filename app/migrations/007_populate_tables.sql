@@ -52,4 +52,4 @@ INSERT INTO public.produto (cinema_id, nome, descricao, categoria, preco, imagem
 (1, 'Refrigerante 700ml', 'Coca-Cola, Guaraná ou Fanta.', 'Bebidas', 15.00, 'http://example.com/refri.jpg'),
 (1, 'Combo Casal', '2 Pipocas Médias + 2 Refrigerantes 500ml.', 'Combos', 65.00, 'http://example.com/combo.jpg'),
 (1, 'Chocolate M&Ms', 'Pacote de M&Ms 100g.', 'Doces', 12.00, 'http://example.com/mms.jpg'),
-(1, 'Água Mineral', 'Garrafa de 500ml sem gás.', 'Bebidas', 8.00, NULL);
+(1, 'Água Mineral', 'Garrafa de 500ml sem gás.', 'Bebidas', 8.00, 'http://example.com/mme.jpg');
